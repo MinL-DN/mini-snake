@@ -1,0 +1,25 @@
+{
+  "name": "mini-snake",
+  "version": "1.0.0",
+  "description": "",
+  "main": "game.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "eslintConfig": {
+    "extends": "eslint-config-gl-node",
+    "globals": {
+      "canvas": false
+    }
+  },
+  "devDependencies": {
+    "eslint": "^5.12.1",
+    "eslint-config-gl-node": "http://nexus.17usoft.com/repository/npm-tcgl/eslint-config-gl-node/-/eslint-config-gl-node-0.0.7.tgz"
+  },
+  "dependencies": {
+    "uuid": "3.3.3"
+  },
+  "email": "minl_dn@163.com"
+}
