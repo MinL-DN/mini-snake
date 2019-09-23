@@ -14,7 +14,7 @@ let loadRe = new LoadRe();
 
 loadRe.load().then(re => {
 
-    ctx.test = 1;
+    // ctx.test = 1;
 
     ctx.resources = re;
 

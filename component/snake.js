@@ -3,7 +3,7 @@
 const GradientColor = require('../utils/gradientColor');
 const { getGuid } = require('../utils/index');
 
-const COLORS = ['#f4ff00', '#00ff0f', '#00ffe2', '#006bff', '#3a00ff', '#bb00ff', '#ff00e5', '#ff0092', '#ff0063', '#ff0040'];
+const COLORS = ['#00fffa', '#009aff', '#005fff', '#1700ff', '#8c00ff', '#eb00ff', '#ff00aa', '#ff0092', '#00ffee', '#ff007a'];
 
 module.exports = class Snake {
 
@@ -25,7 +25,7 @@ module.exports = class Snake {
 
         // 根据蛇身渲染蛇
         for (let i = 0; i < snakeLen; i++) {
-            this.renderSnake(i);
+            this.renderSnake();
         }
     }
 
@@ -33,9 +33,9 @@ module.exports = class Snake {
      * 生成蛇段实例
      * 需要蛇增长也调用此方法
      *
-     * @param {*} index  index = 0是蛇头，其余是蛇身
+     * @param {*} this.snakeBodys[0] 是蛇头，其余是蛇身
      */
-    renderSnake(index) {
+    renderSnake() {
 
         let position = [0, 0];
 
@@ -49,12 +49,10 @@ module.exports = class Snake {
             position = this.isRobot ? [x, y] : ['center', 'center'];
         }
 
-        let _snake = this.scene.dom({
-            name: `snake-${index.toString().padStart(5, 0)}-${this.snakeId}`,
+        this.snakeBodys.push(this.scene.dom({
+            name: `snake-${this.snakeBodys.length.toString().padStart(5, 0)}-${this.snakeId}`,
             position
-        });
-
-        this.snakeBodys.push(_snake);
+        }));
 
         this.computeSnake();
     }
@@ -81,10 +79,11 @@ module.exports = class Snake {
         ];
 
         let snakeColor = new GradientColor(...this.colors, snakeL); // 蛇身渐变色
+        let prevSnake =  this.scene.snakes[this.snakesIndex];
 
         this.snakeBodys.forEach((v, i) => {
             v.bg = snakeColor[i];
-            v.zoom = snakeL - i;
+            v.zoom = (prevSnake ? prevSnake.snakeBodys[0].zoom : 0) + snakeL - i;
             v.size = [self.radius, self.radius];
             v.radius = self.radius;
         });
@@ -101,33 +100,32 @@ module.exports = class Snake {
 
         let self = this;
         let snakeHead = self.snakeBodys[0];
+        let dshp = []; // diff shake head poition
+        let isHitWall = false; // 是否碰壁
+        // let foods = self.scene.doms.filter(v => /food-/.test(v.domName));
 
+        // 都是0的时候就停止移动
         if (self.moveSinCos[0] == 0 && self.moveSinCos[1] == 0) return;
-
-        // 机器蛇随机乱动
-        if (self.isRobot && Math.random() * 100 < 5) self.computeSnake();
 
         // 横纵轴处理逻辑类似，此处用for循环处理，简化代码 0：X轴 1：Y轴
         for (let i = 0; i < 2; i++) {
-
-            let snakeHeadPos = snakeHead.position[i] + self.moveSinCos[i]; // 蛇头坐标
-
-            if (snakeHeadPos <= self.limitArea[i][0] || snakeHeadPos >= self.limitArea[i][1]) { // 边界碰撞处理
-
-                if (self.isRobot) { // 机器人将要碰墙时回头
-                    self.computeSnake();
-                } else {
-                    self.moveSinCos = [0, 0];
-                }
-
-                return;
+            dshp[i] = snakeHead.position[i] + self.moveSinCos[i]; // 蛇头坐标
+            if (dshp[i] <= self.limitArea[i][0] || dshp[i] >= self.limitArea[i][1]) { // 边界碰撞处理
+                isHitWall = true;
             }
-
-            // 蛇头赋值
-            snakeHead.position[i] = snakeHeadPos;
         }
 
-        // 蛇身移逻辑
+        if (self.isRobot && (Math.random() * 100 < 5 || isHitWall)) { // 机器蛇 随机转向 或者将要碰墙时自动调转方向
+            return self.computeSnake();
+        } else if (isHitWall) { // 玩家蛇 撞墙弹框提示并且终止游戏
+            self.isHitWall = isHitWall;
+            return;
+        }
+
+        // 蛇头赋值
+        snakeHead.position = dshp;
+
+        // 遍历蛇身
         self.snakeBodys.reduce((_prev, v, i) => {
 
             let _pos = v.position;
@@ -140,10 +138,44 @@ module.exports = class Snake {
                 if (xy[j] > self.limitArea[j][1]) xy[j] = self.limitArea[j][1];
             }
 
-            if (i) v.position = xy;
+            if (i) { // 蛇身移逻辑
+                v.position = xy;
+            } else { // 蛇头碰撞逻辑
+
+                // 与其他蛇碰撞
+                for (let j = 0; j < self.scene.snakes.length; j++) {
+                    const snake = self.scene.snakes[j];
+
+                    if (snake.snakeId == self.snakeId) continue;
+
+                    let { z } = computerOffset(snake.snakeBodys[0].position, v.position);
+
+                    if (z <= v.radius) {
+                        if (!snake.isRobot) { // 玩家蛇碰撞
+                            console.log('hit');
+                        }
+                        break;
+                    }
+                }
+
+                // 与食物碰撞
+                // self.scene.foods.forEach(food => {
+                //     let { z } = computerOffset(food.position, v.position);
+                //     if (z < self.radius / 2 && !self.isRobot) {
+                //         food.beEaten();
+                //         self.renderSnake();
+                //     }
+                // });
+            }
 
             return _pos;
-
-        }, snakeHead.position);
+        }, dshp);
     }
 };
+
+function computerOffset(posA, posB) {
+    let x = posA[0] - posB[0];
+    let y = posA[1] - posB[1];
+    let z = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+    return { sin: x / z, cos: y / z, z };
+}

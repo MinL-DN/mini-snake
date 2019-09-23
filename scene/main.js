@@ -2,6 +2,7 @@
 const Base = require('./index');
 const Snake = require('../component/snake');
 const Camera = require('../component/camera');
+const Food = require('../component/food');
 
 module.exports = class Main extends Base {
 
@@ -10,8 +11,10 @@ module.exports = class Main extends Base {
         console.log('this main');
         this.runSecond = 0;
         this.snakes = [];
+        this.foods = [];
         this.buildDom(); // 实例化蛇等
         this.camera = new Camera(ctx); // 实例化摄像机
+        this.gameStatus = 2; // 1、待机 2、进行 3、游戏结束
     }
 
     buildDom() {
@@ -34,9 +37,15 @@ module.exports = class Main extends Base {
 
         for (let i = 0; i < 20; i++) {
             this.snakes.push(new Snake({
-                scene   : this,
-                isRobot : i !== 0
+                scene       : this,
+                isRobot     : i !== 0,
+                snakesIndex : i
             }));
+            if (!i) this.player = this.snakes[0];
+
+            for (let index = 0; index < 5; index++) {
+                this.foods.push(new Food({ scene: this }));
+            }
         }
 
         // 顶层遮罩
@@ -58,14 +67,10 @@ module.exports = class Main extends Base {
 
                 if (!this.moveOffset.touches.length) return;
 
-                let x = e.touches[0].clientX - this.moveOffset.touches[0].clientX;
-                let y = e.touches[0].clientY - this.moveOffset.touches[0].clientY;
-                let z = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-                let sin = x / z * self.snakes[0].speed;
-                let cos = y / z * self.snakes[0].speed;
+                let { sin, cos } = computerOffset([e.touches[0].clientX, e.touches[0].clientY], [this.moveOffset.touches[0].clientX, this.moveOffset.touches[0].clientY]);
 
-                if (sin) self.snakes[0].moveSinCos[0] = sin;
-                if (cos) self.snakes[0].moveSinCos[1] = cos;
+                if (sin) self.snakes[0].moveSinCos[0] = sin * self.snakes[0].speed;
+                if (cos) self.snakes[0].moveSinCos[1] = cos * self.snakes[0].speed;
 
                 this.moveOffset = e;
             },
@@ -79,10 +84,23 @@ module.exports = class Main extends Base {
     // 每帧更新方法
     update() {
 
-        this.snakes.map(v => v.autoMove());
+        if (this.gameStatus !== 2) return;
+
+        let player = this.player;
+
+        // 玩家蛇撞墙停止游戏
+        if (player.isHitWall) {
+            return this.stopGame('撞墙啦！');
+        }
+
+        // 蛇自动移动
+        for (let i = 0; i < this.snakes.length; i++) {
+            const snake = this.snakes[i];
+            snake.autoMove();
+        }
 
         if (!this.ctx.test) {
-            this.camera.move(this.snakes[0].moveSinCos, this.snakes[0].snakeBodys[0], this.bgDom);
+            this.camera.move(player.moveSinCos, player.snakeBodys[0], this.bgDom);
             this.mask.position = this.camera.canvasOffset; // 背景图固定
         }
 
@@ -98,7 +116,19 @@ module.exports = class Main extends Base {
     }
 
     // 终止游戏
-    stopGame() {
-        // console.log('game end');
+    stopGame(str = '游戏结束！') {
+        // this.gameStatus = 3;
+        wx.showToast({
+            title    : str,
+            icon     : 'success',
+            duration : 2000
+        });
     }
 };
+
+function computerOffset(posA, posB) {
+    let x = posA[0] - posB[0];
+    let y = posA[1] - posB[1];
+    let z = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+    return { sin: x / z, cos: y / z, z };
+}
