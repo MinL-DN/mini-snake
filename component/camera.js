@@ -2,7 +2,7 @@
 
 const { getGuid } = require('../utils/index');
 
-const WrapperMargin = 50;
+const WrapperMargin = 150;
 const SCREEN = [window.innerWidth, window.innerHeight];
 
 module.exports = class Camera {

@@ -54,7 +54,7 @@ module.exports = class Base {
         this.DOMHighResTimeStamp = e;
 
         // 清除上一局的动画
-        this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+        this.ctx.clearRect(...this.canvasOffset || [0, 0], canvas.width, canvas.height);
 
         this.doms.sort((a, b) => a.zoom - b.zoom > 0 ? 1 : -1).map(v => v.render());
 

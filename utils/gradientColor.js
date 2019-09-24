@@ -2,6 +2,8 @@
 class GradientColor {
     constructor(startColor, endColor, step) {
 
+        step = step - 1;
+
         let startRGB = this.colorRgb(startColor);//转换为rgb数组模式
         let startR = startRGB[0];
         let startG = startRGB[1];
@@ -16,12 +18,13 @@ class GradientColor {
         let sG = (endG - startG) / step;
         let sB = (endB - startB) / step;
 
-        let colorArr = [];
-        for (let i = 0; i < step; i++) {
+        let colorArr = [startColor];
+        for (let i = 1; i < step; i++) {
             //计算每一步的hex值
             let hex = this.colorHex('rgb(' + parseInt(sR * i + startR) + ',' + parseInt(sG * i + startG) + ',' + parseInt(sB * i + startB) + ')');
             colorArr.push(hex);
         }
+        colorArr.push(endColor);
         return colorArr;
     }
 

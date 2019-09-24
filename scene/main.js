@@ -41,8 +41,6 @@ module.exports = class Main extends Base {
                 isRobot     : i !== 0,
                 snakesIndex : i
             }));
-            if (!i) this.player = this.snakes[0];
-
             for (let index = 0; index < 5; index++) {
                 this.foods.push(new Food({ scene: this }));
             }
@@ -86,7 +84,7 @@ module.exports = class Main extends Base {
 
         if (this.gameStatus !== 2) return;
 
-        let player = this.player;
+        let player = this.snakes[0];
 
         // 玩家蛇撞墙停止游戏
         if (player.isHitWall) {

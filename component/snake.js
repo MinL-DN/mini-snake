@@ -4,6 +4,7 @@ const GradientColor = require('../utils/gradientColor');
 const { getGuid } = require('../utils/index');
 
 const COLORS = ['#00fffa', '#009aff', '#005fff', '#1700ff', '#8c00ff', '#eb00ff', '#ff00aa', '#ff0092', '#00ffee', '#ff007a'];
+const OFFSET = 1;
 
 module.exports = class Snake {
 
@@ -12,10 +13,10 @@ module.exports = class Snake {
         console.log('create a snake');
 
         let baseRandom = parseInt(Math.random() * 10);
-        let snakeLen   = params.snakeLen || 20 + baseRandom;
+        let snakeLen   = params.snakeLen || 20;
 
         Object.assign(this, {
-            speed      : 2 + baseRandom * 0.05,
+            speed      : 2,
             snakeId    : getGuid(),
             snakeBodys : [],
             colors     : params.isRobot ? [COLORS[baseRandom], '#eee'] : ['#ff0000', '#ffff00']
@@ -35,7 +36,7 @@ module.exports = class Snake {
      *
      * @param {*} this.snakeBodys[0] 是蛇头，其余是蛇身
      */
-    renderSnake() {
+    renderSnake(moveSinCos) {
 
         let position = [0, 0];
 
@@ -54,11 +55,11 @@ module.exports = class Snake {
             position
         }));
 
-        this.computeSnake();
+        this.computeSnake(moveSinCos);
     }
 
     // 计算蛇的各种属性
-    computeSnake() {
+    computeSnake(moveSinCos) {
 
         let self = this;
 
@@ -67,7 +68,7 @@ module.exports = class Snake {
         // 蛇偏移量计算
         let offsetX = Math.random() * this.speed * randomPlusMinus();
         let offsetY = Math.sqrt(Math.pow(this.speed, 2) - Math.pow(offsetX, 2)) * randomPlusMinus();
-        this.moveSinCos = [offsetX, offsetY];
+        this.moveSinCos = moveSinCos || [offsetX, offsetY];
 
         // 计算蛇长
         this.radius = snakeL / 4 + 25; // 根据蛇长算出蛇宽度
@@ -79,7 +80,7 @@ module.exports = class Snake {
         ];
 
         let snakeColor = new GradientColor(...this.colors, snakeL); // 蛇身渐变色
-        let prevSnake =  this.scene.snakes[this.snakesIndex];
+        let prevSnake =  this.scene.snakes[this.snakesIndex - 1];
 
         this.snakeBodys.forEach((v, i) => {
             v.bg = snakeColor[i];
@@ -96,20 +97,17 @@ module.exports = class Snake {
     // 每帧更新方法
     autoMove() {
 
-        const OFFSET = 0.5;
-
         let self = this;
         let snakeHead = self.snakeBodys[0];
         let dshp = []; // diff shake head poition
         let isHitWall = false; // 是否碰壁
-        // let foods = self.scene.doms.filter(v => /food-/.test(v.domName));
 
         // 都是0的时候就停止移动
         if (self.moveSinCos[0] == 0 && self.moveSinCos[1] == 0) return;
 
         // 横纵轴处理逻辑类似，此处用for循环处理，简化代码 0：X轴 1：Y轴
         for (let i = 0; i < 2; i++) {
-            dshp[i] = snakeHead.position[i] + self.moveSinCos[i]; // 蛇头坐标
+            dshp[i] = snakeHead.position[i] + self.moveSinCos[i] * OFFSET; // 蛇头坐标
             if (dshp[i] <= self.limitArea[i][0] || dshp[i] >= self.limitArea[i][1]) { // 边界碰撞处理
                 isHitWall = true;
             }
@@ -122,54 +120,101 @@ module.exports = class Snake {
             return;
         }
 
-        // 蛇头赋值
-        snakeHead.position = dshp;
+        // 蛇移动（可以想象为蛇尾替换到蛇头的位置）
+        let tail = self.snakeBodys.pop();
+        tail.position = dshp;
+        tail.zoom = snakeHead.zoom;
+        self.snakeBodys.unshift(tail);
+        self.computeSnake(self.moveSinCos);
 
-        // 遍历蛇身
-        self.snakeBodys.reduce((_prev, v, i) => {
+        // if (!i) { // 蛇头碰撞逻辑
 
-            let _pos = v.position;
-            let xy = [];
+        //     // 与其他蛇碰撞
+        //     for (let j = 0; j < self.scene.snakes.length; j++) {
+        //         const snake = self.scene.snakes[j];
 
-            for (let j = 0; j < 2; j++) {
-                xy[j] = _prev[j] - self.moveSinCos[j] * OFFSET;
-                // 蛇身也不要超过范围
-                if (xy[j] < self.limitArea[j][0]) xy[j] = self.limitArea[j][0];
-                if (xy[j] > self.limitArea[j][1]) xy[j] = self.limitArea[j][1];
-            }
+        //         if (snake.snakeId == self.snakeId) continue;
 
-            if (i) { // 蛇身移逻辑
-                v.position = xy;
-            } else { // 蛇头碰撞逻辑
+        //         let { z } = computerOffset(snake.snakeBodys[0].position, v.position);
 
-                // 与其他蛇碰撞
-                for (let j = 0; j < self.scene.snakes.length; j++) {
-                    const snake = self.scene.snakes[j];
+        //         if (z <= v.radius) {
+        //             if (!snake.isRobot) { // 玩家蛇碰撞
+        //                 console.log('hit');
+        //             }
+        //         }
+        //     }
 
-                    if (snake.snakeId == self.snakeId) continue;
+        //     // 与食物碰撞
+        //     for (let j = 0; j < self.scene.foods.length; j++) {
+        //         const food = self.scene.foods[j];
+        //         let { z } = computerOffset(food.position, v.position);
+        //         if (z < self.radius / 2) {
+        //             food.beEaten();
+        //             self.renderSnake(self.moveSinCos);
 
-                    let { z } = computerOffset(snake.snakeBodys[0].position, v.position);
+        //             // for (let index = 0; index < 5; index++) {
+        //             //     self.renderSnake(self.moveSinCos);
+        //             // }
+        //         }
+        //     }
 
-                    if (z <= v.radius) {
-                        if (!snake.isRobot) { // 玩家蛇碰撞
-                            console.log('hit');
-                        }
-                        break;
-                    }
-                }
+        // }
 
-                // 与食物碰撞
-                // self.scene.foods.forEach(food => {
-                //     let { z } = computerOffset(food.position, v.position);
-                //     if (z < self.radius / 2 && !self.isRobot) {
-                //         food.beEaten();
-                //         self.renderSnake();
-                //     }
-                // });
-            }
+        // // 蛇头赋值
+        // snakeHead.position = dshp;
 
-            return _pos;
-        }, dshp);
+        // let prevPos = dshp;
+
+        // // 遍历蛇身
+        // for (let i = 0; i < self.snakeBodys.length; i++) {
+
+        //     const v = self.snakeBodys[i];
+
+        //     if (!i) { // 蛇头碰撞逻辑
+
+        //         // 与其他蛇碰撞
+        //         for (let j = 0; j < self.scene.snakes.length; j++) {
+        //             const snake = self.scene.snakes[j];
+
+        //             if (snake.snakeId == self.snakeId) continue;
+
+        //             let { z } = computerOffset(snake.snakeBodys[0].position, v.position);
+
+        //             if (z <= v.radius) {
+        //                 if (!snake.isRobot) { // 玩家蛇碰撞
+        //                     console.log('hit');
+        //                 }
+        //             }
+        //         }
+
+        //         // 与食物碰撞
+        //         for (let j = 0; j < self.scene.foods.length; j++) {
+        //             const food = self.scene.foods[j];
+        //             let { z } = computerOffset(food.position, v.position);
+        //             if (z < self.radius / 2) {
+        //                 food.beEaten();
+        //                 self.renderSnake(self.moveSinCos);
+
+        //                 // for (let index = 0; index < 5; index++) {
+        //                 //     self.renderSnake(self.moveSinCos);
+        //                 // }
+        //             }
+        //         }
+
+        //     } else { // 蛇身移逻辑
+        //         if (secondFlag) {
+        //             let xy = [];
+        //             for (let j = 0; j < 2; j++) {
+        //                 xy[j] = prevPos[j] - self.moveSinCos[j] * OFFSET;
+        //                 // 蛇身也不要超过范围
+        //                 if (xy[j] < self.limitArea[j][0]) xy[j] = self.limitArea[j][0];
+        //                 if (xy[j] > self.limitArea[j][1]) xy[j] = self.limitArea[j][1];
+        //             }
+        //             prevPos = v.position;
+        //             v.position = xy;
+        //         }
+        //     }
+        // }
     }
 };
 
