@@ -27,7 +27,7 @@ module.exports = class LoadRe {
 
 function getImg(src) {
     return new Promise(res => {
-        let img = new Image();
+        let img = wx.createImage();
         img.src = src;
         img.onload = () => res(img);
     });
