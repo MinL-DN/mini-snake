@@ -1,6 +1,7 @@
 
 const Base = require('./index');
 const Snake = require('../component/snake');
+// const Snake = require('../component/snake-line');
 const Camera = require('../component/camera');
 const Food = require('../component/food');
 
@@ -35,15 +36,15 @@ module.exports = class Main extends Base {
             [this.bgDom.position[1], this.bgDom.position[1] + this.bgDom.size[1]]
         ];
 
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 1; i++) {
             this.snakes.push(new Snake({
                 scene       : this,
                 isRobot     : i !== 0,
                 snakesIndex : i
             }));
-            for (let index = 0; index < 5; index++) {
-                this.foods.push(new Food({ scene: this }));
-            }
+            // for (let index = 0; index < 5; index++) {
+            //     this.foods.push(new Food({ scene: this }));
+            // }
         }
 
         // 顶层遮罩
@@ -99,10 +100,8 @@ module.exports = class Main extends Base {
 
         if (!this.ctx.test) {
             this.camera.move(player.moveSinCos, player.snakeBodys[0], this.bgDom);
-            this.mask.position = this.camera.canvasOffset; // 背景图固定
+            this.mask.position = this.ctx.canvasOffset; // 背景图固定
         }
-
-        this.canvasOffset = this.camera.canvasOffset; // 偏移量用作之后的时间定位计算
 
         // 每秒钟可以干的事情。。。
         let runSecond = parseInt(this.DOMHighResTimeStamp / 1000);

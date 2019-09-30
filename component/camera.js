@@ -11,7 +11,7 @@ module.exports = class Camera {
         console.log('create a camera');
         this.cameraId = getGuid();
         this.ctx = ctx;
-        this.canvasOffset = [0, 0];
+        this.ctx.canvasOffset = [0, 0];
     }
 
     /**
@@ -26,7 +26,7 @@ module.exports = class Camera {
         // 横纵轴处理逻辑类似，此处用for循环处理，简化代码 0：X轴 1：Y轴
         for (let i = 0; i < 2; i++) {
 
-            let cOffset       = this.canvasOffset[i];
+            let cOffset       = this.ctx.canvasOffset[i];
             let tri           = moveSinCos[i];
             let dCanvasOffset = cOffset + tri;
 
@@ -40,11 +40,11 @@ module.exports = class Camera {
                 dCanvasOffset > bgLimit[0] && // 背景也不可出边框
                 dCanvasOffset < bgLimit[1]
             ) {
-                this.canvasOffset[i] = dCanvasOffset; // 记录 canvas 偏移量
+                this.ctx.canvasOffset[i] = dCanvasOffset; // 记录 canvas 偏移量
                 this.ctx.translate(...i == 0 ? [tri * -1, 0] : [0, tri * -1]); // 镜头反方向移动
             }
         }
 
-        return this.canvasOffset;
+        return this.ctx.canvasOffset;
     }
 };

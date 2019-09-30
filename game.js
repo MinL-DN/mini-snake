@@ -15,7 +15,6 @@ let loadRe = new LoadRe();
 loadRe.load().then(re => {
 
     // ctx.test = 1;
-
     ctx.resources = re;
 
     // 抗锯齿处理

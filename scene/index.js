@@ -54,7 +54,7 @@ module.exports = class Base {
         this.DOMHighResTimeStamp = e;
 
         // 清除上一局的动画
-        this.ctx.clearRect(...this.canvasOffset || [0, 0], canvas.width, canvas.height);
+        this.ctx.clearRect(...this.ctx.canvasOffset || [0, 0], canvas.width, canvas.height);
 
         this.doms.sort((a, b) => a.zoom - b.zoom > 0 ? 1 : -1).map(v => v.render());
 
@@ -72,8 +72,8 @@ for (let i = 0; i < touchEvents.length; i++) {
     wx[touchEvent](function(e) {
         let touch = e.touches.length ? e.touches : e.changedTouches;
 
-        let x = touch[0].clientX + (currentScene.canvasOffset ? currentScene.canvasOffset[0] : 0);
-        let y = touch[0].clientY + (currentScene.canvasOffset ? currentScene.canvasOffset[1] : 0);
+        let x = touch[0].clientX + (currentScene.ctx.canvasOffset ? currentScene.ctx.canvasOffset[0] : 0);
+        let y = touch[0].clientY + (currentScene.ctx.canvasOffset ? currentScene.ctx.canvasOffset[1] : 0);
 
         for (let index in currentScene.doms) {
             let dom = currentScene.doms[index];

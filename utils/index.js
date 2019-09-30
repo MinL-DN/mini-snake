@@ -10,8 +10,9 @@ module.exports = {
     },
     antiAliasing(ctx) {
 
-        let width = canvas.width;
-        let height = canvas.height;
+        let width = ctx.canvas.width;
+        let height = ctx.canvas.height;
+        ctx.canvasInnerWH = [width, height];
 
         if (window.devicePixelRatio) {
             canvas.style.width = width + 'px';

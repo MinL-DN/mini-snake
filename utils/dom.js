@@ -41,11 +41,26 @@ module.exports = class Dom {
                 domName : params.name
             }
         );
+
+        this.render();
     }
 
     render() {
 
         let ctx = this.scene.ctx;
+
+        // 超出屏幕不渲染
+        if (
+            ctx.canvasOffset && this.size[0] < ctx.canvasInnerWH[0] && this.size[1] < ctx.canvasInnerWH[1] &&
+            (
+                this.position[0] + this.size[0] < ctx.canvasOffset[0] ||
+                this.position[1] + this.size[0] < ctx.canvasOffset[1] ||
+                this.position[0] - this.size[0] > ctx.canvasOffset[0] + ctx.canvasInnerWH[0] ||
+                this.position[1] - this.size[1] > ctx.canvasOffset[1] + ctx.canvasInnerWH[1]
+            )
+        ) {
+            return;
+        }
 
         ctx.save();
 
@@ -71,6 +86,21 @@ module.exports = class Dom {
                 ctx.fillText(this.text, this.position[0], this.position[1] + this.fontSize / 2 + 2);
             }
         }
+        //  else if (this.isSnake) {
+        //     ctx.beginPath();
+        //     let gradient = ctx.createLinearGradient(0, 0, 70, 55);
+        //     gradient.addColorStop(0, "red");
+        //     gradient.addColorStop(1, "yellow");
+        //     ctx.strokeStyle = gradient;
+        //     ctx.lineWidth = 10;
+        //     ctx.lineCap = 'round';
+        //     ctx.lineJoin = 'round';
+        //     ctx.moveTo(20, 20);
+        //     ctx.lineTo(30, 40);
+        //     ctx.lineTo(50, 60);
+        //     ctx.lineTo(70, 55);
+        //     ctx.stroke();
+        // }
         ctx.restore();
     }
 
