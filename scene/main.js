@@ -1,6 +1,6 @@
 
 const Base = require('./index');
-const Snake = require('../component/snake');
+const Snake = require('../component/snake-trajectory');
 // const Snake = require('../component/snake-line');
 const Camera = require('../component/camera');
 const Food = require('../component/food');
@@ -83,6 +83,17 @@ module.exports = class Main extends Base {
     // 每帧更新方法
     update() {
 
+        let timeFlag = false;
+
+        // 每秒钟可以干的事情。。。
+        let runSecond = parseInt(this.DOMHighResTimeStamp / 50);
+        if (runSecond > this.runSecond) {
+            this.runSecond = runSecond;
+            timeFlag = true;
+            // console.log(this.runSecond);
+            // if (runSecond > 10) self.snakeEVO();
+        }
+
         if (this.gameStatus !== 2) return;
 
         let player = this.snakes[0];
@@ -95,20 +106,12 @@ module.exports = class Main extends Base {
         // 蛇自动移动
         for (let i = 0; i < this.snakes.length; i++) {
             const snake = this.snakes[i];
-            snake.autoMove();
+            snake.autoMove(timeFlag);
         }
 
         if (!this.ctx.test) {
             this.camera.move(player.moveSinCos, player.snakeBodys[0], this.bgDom);
             this.mask.position = this.ctx.canvasOffset; // 背景图固定
-        }
-
-        // 每秒钟可以干的事情。。。
-        let runSecond = parseInt(this.DOMHighResTimeStamp / 1000);
-        if (runSecond > this.runSecond) {
-            this.runSecond = runSecond;
-            // console.log(this.runSecond);
-            // if (runSecond > 10) self.snakeEVO();
         }
     }
 
