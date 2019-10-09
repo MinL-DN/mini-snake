@@ -1,18 +1,13 @@
 const { getGuid } = require('./index');
 
-const screenWH = [window.innerWidth, window.innerHeight];
-
 // dom 生成插件
 module.exports = class Dom {
 
-    constructor(params, scene) {
+    constructor(params, ctx) {
 
-        if (scene.doms.find(v => v.domName == params.name)) {
-            return console.log(params.name + ' 重名啦！');
-        }
-
-        if (params.img && scene.ctx.resources[params.img]) {
-            params.img = scene.ctx.resources[params.img];
+        // 渲染img
+        params.img = params.img || window.resources[params.imgSrc];
+        if (params.img) {
             params.size = [params.img.width, params.img.height];
         }
 
@@ -23,22 +18,21 @@ module.exports = class Dom {
                 align : 'left'
             }, params.textStyle);
 
-            scene.ctx.font = params.textStyle.font;
-            params.fontSize = Number((scene.ctx.font.match(/(\d+)px/) || [0, 0])[1]);
-            params.size = [(scene.ctx.measureText(params.text) || { width: 0 }).width, params.fontSize];
+            ctx.font = params.textStyle.font;
+            params.fontSize = Number((ctx.font.match(/(\d+)px/) || [0, 0])[1]);
+            params.size = [(ctx.measureText(params.text) || { width: 0 }).width, params.fontSize];
         }
 
-        let size = this.computeOffset(params.size, 'size'); // 计算相对屏幕大小
-        let position = this.computeOffset(params.position, 'position', size); // 相对位置计算
+        let size = this.computeOffset(ctx, params.size, 'size'); // 计算相对屏幕大小
+        let position = this.computeOffset(ctx, params.position, 'position', size); // 相对位置计算
 
         Object.assign(
             this,
             { border: 0, radius: 0, text: '', textStyle: {}, fontSize: 0 },
             params,
             {
-                scene, size, position,
-                domId   : getGuid(),
-                domName : params.name
+                ctx, size, position,
+                domId: getGuid()
             }
         );
 
@@ -47,7 +41,7 @@ module.exports = class Dom {
 
     render() {
 
-        let ctx = this.scene.ctx;
+        let ctx = this.ctx;
 
         // 超出屏幕不渲染
         if (
@@ -86,26 +80,14 @@ module.exports = class Dom {
                 ctx.fillText(this.text, this.position[0], this.position[1] + this.fontSize / 2 + 2);
             }
         }
-        //  else if (this.isSnake) {
-        //     ctx.beginPath();
-        //     let gradient = ctx.createLinearGradient(0, 0, 70, 55);
-        //     gradient.addColorStop(0, "red");
-        //     gradient.addColorStop(1, "yellow");
-        //     ctx.strokeStyle = gradient;
-        //     ctx.lineWidth = 10;
-        //     ctx.lineCap = 'round';
-        //     ctx.lineJoin = 'round';
-        //     ctx.moveTo(20, 20);
-        //     ctx.lineTo(30, 40);
-        //     ctx.lineTo(50, 60);
-        //     ctx.lineTo(70, 55);
-        //     ctx.stroke();
-        // }
+
         ctx.restore();
     }
 
     // 计算相对屏幕的大小或者位置
-    computeOffset(values = [], type = 'position', size = []) {
+    computeOffset(ctx, values = [], type = 'position', size = []) {
+
+        let canvasWH = ctx.canvasInnerWH;
 
         let result = [];
 
@@ -121,15 +103,15 @@ module.exports = class Dom {
 
             if (type == 'position') {
                 if (value == 'center') {
-                    value = (screenWH[i] - size[i]) / 2 + offset;
+                    value = (canvasWH[i] - size[i]) / 2 + offset;
                 } else if (value == 'left' && i == 0 || value == 'top' && i == 1) {
                     value = 0 + offset;
                 } else if (value == 'right' && i == 0 || value == 'bottom' && i == 1) {
-                    value = screenWH[i] - size[i] + offset;
+                    value = canvasWH[i] - size[i] + offset;
                 }
             } else {
                 if (value == 'full') {
-                    value = screenWH[i] + offset;
+                    value = canvasWH[i] + offset;
                 }
             }
 
@@ -145,7 +127,7 @@ module.exports = class Dom {
      */
     drawRoundRect(type, x, y, w, h, r) {
 
-        let ctx = this.scene.ctx;
+        let ctx = this.ctx;
         let radius = r || 0;
         if (radius > (w > h ? h : w) / 2) radius = h / 2;
 

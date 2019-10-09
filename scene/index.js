@@ -1,62 +1,33 @@
 
 const { getGuid } = require('../utils/index');
-const Dom = require('../utils/dom');
-const scenes = [];
-let currentScene = null;
 
 // base
 module.exports = class Base {
 
-    constructor(ctx) {
+    constructor() {
         this.aniId = 0;
         this.sceneId = getGuid();
-        this.ctx = ctx;
-        this.doms = [];
-
-        currentScene = this;
-        scenes.push(this);
-
+        this.screenCanvas = window.canvasPage[0];
         this.restart();
     }
 
     restart() {
         // 循环动画
-        this.aniStartTime = Date.now();
         this.bindLoop = this.loop.bind(this);
         window.cancelAnimationFrame(this.aniId);
-        this.aniId = window.requestAnimationFrame(this.bindLoop);
-    }
-
-    dom(params) {
-        let _dom = new Dom(params, this);
-        this.doms.push(_dom);
-        return _dom;
-    }
-
-    findDom(domName) {
-        return this.doms.find(v => v.domName == domName);
-    }
-
-    openScene(pageName) {
-
-        let Scene = require('./' + pageName);
-
-        if (Scene && Scene.constructor) {
-            new Scene(this.ctx);
-        } else {
-            console.log('无此页面！');
-        }
+        window.requestAnimationFrame(this.bindLoop);
     }
 
     // loop
     loop(e) {
 
+        let screenCanvas = this.screenCanvas;
+
         this.DOMHighResTimeStamp = e;
 
-        // 清除上一局的动画
-        this.ctx.clearRect(...this.ctx.canvasOffset || [0, 0], canvas.width, canvas.height);
+        screenCanvas.ctx.clearRect(...[0, 0, screenCanvas.width, screenCanvas.height]); // 清除上一局的动画
 
-        this.doms.sort((a, b) => a.zoom - b.zoom > 0 ? 1 : -1).map(v => v.render());
+        screenCanvas.doms.sort((a, b) => a.zoom - b.zoom > 0 ? 1 : -1).map(dom => dom.render()); // 计算dom动态
 
         typeof this.update == 'function' && this.update(); // 每帧更新动画
 
@@ -72,11 +43,12 @@ for (let i = 0; i < touchEvents.length; i++) {
     wx[touchEvent](function(e) {
         let touch = e.touches.length ? e.touches : e.changedTouches;
 
-        let x = touch[0].clientX + (currentScene.ctx.canvasOffset ? currentScene.ctx.canvasOffset[0] : 0);
-        let y = touch[0].clientY + (currentScene.ctx.canvasOffset ? currentScene.ctx.canvasOffset[1] : 0);
+        let ctx = window.canvasPage[0].ctx;
+        let x = touch[0].clientX + (ctx.canvasOffset ? ctx.canvasOffset[0] : 0);
+        let y = touch[0].clientY + (ctx.canvasOffset ? ctx.canvasOffset[1] : 0);
 
-        for (let index in currentScene.doms) {
-            let dom = currentScene.doms[index];
+        for (let index in window.canvasPage[0].doms) {
+            let dom = window.canvasPage[0].doms[index];
             // if (touchEvent == 'onTouchMove' && dom[touchEvent]) {
             //     'onTouchMove';
             //     touchEvent;

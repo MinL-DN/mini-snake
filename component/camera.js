@@ -17,21 +17,20 @@ module.exports = class Camera {
     /**
      * 每帧更新方法
      *
-     * @param {array} moveSinCos xy 偏移量
-     * @param {Dom} moveTarget 移动 dom
+     * @param {Dom} player 玩家
      * @param {Dom} limitTarget 边框限制区域
      */
-    move(moveSinCos, moveTarget, limitTarget) {
+    move(player, limitTarget) {
 
         // 横纵轴处理逻辑类似，此处用for循环处理，简化代码 0：X轴 1：Y轴
         for (let i = 0; i < 2; i++) {
 
             let cOffset       = this.ctx.canvasOffset[i];
-            let tri           = moveSinCos[i];
+            let tri           = player.moveSinCos[i] * player.speed;
             let dCanvasOffset = cOffset + tri;
 
-            let snakeHeadPos  = moveTarget.position[i] + tri; // 蛇头坐标
-            let bgMoveArea    = [cOffset + WrapperMargin, cOffset + SCREEN[i] - WrapperMargin - moveTarget.size[i]]; // 背景移动边界
+            let snakeHeadPos  = player.snakeBodys[0].position[i] + tri; // 蛇头坐标
+            let bgMoveArea    = [cOffset + WrapperMargin, cOffset + SCREEN[i] - WrapperMargin - player.snakeBodys[0].size[i]]; // 背景移动边界
             let bgLimit       = [(SCREEN[i] - limitTarget.size[i]) / 2 - WrapperMargin, (limitTarget.size[i] + SCREEN[i]) / 2 + WrapperMargin]; // 摄像头移动边界
 
             // 摄像头移动逻辑
@@ -44,7 +43,5 @@ module.exports = class Camera {
                 this.ctx.translate(...i == 0 ? [tri * -1, 0] : [0, tri * -1]); // 镜头反方向移动
             }
         }
-
-        return this.ctx.canvasOffset;
     }
 };

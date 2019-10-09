@@ -1,20 +1,23 @@
 
 const Base = require('./index');
-const Snake = require('../component/snake-trajectory');
-// const Snake = require('../component/snake-line');
+const Snake = require('../component/snake');
 const Camera = require('../component/camera');
 const Food = require('../component/food');
+const Circle = require('../component/circle');
+
+const { computerOffset } = require('../utils/index');
+
 
 module.exports = class Main extends Base {
 
-    constructor(ctx) {
-        super(ctx);
+    constructor() {
+        super();
         console.log('this main');
         this.runSecond = 0;
         this.snakes = [];
         this.foods = [];
         this.buildDom(); // 实例化蛇等
-        this.camera = new Camera(ctx); // 实例化摄像机
+        this.camera = new Camera(this.screenCanvas.ctx); // 实例化摄像机
         this.gameStatus = 2; // 1、待机 2、进行 3、游戏结束
     }
 
@@ -23,10 +26,10 @@ module.exports = class Main extends Base {
         let self = this;
 
         // 背景图
-        this.bgDom = this.dom({
+        this.bgDom = this.screenCanvas.dom({
             name     : 'bg',
             position : ['center', 'center'],
-            img      : 'public/images/bg.jpg',
+            imgSrc   : 'public/images/bg.jpg',
             zoom     : -1
         });
 
@@ -36,26 +39,48 @@ module.exports = class Main extends Base {
             [this.bgDom.position[1], this.bgDom.position[1] + this.bgDom.size[1]]
         ];
 
-        for (let i = 0; i < 1; i++) {
-            this.snakes.push(new Snake({
+        // let circleCtx = new Circle({ radius: 40, color: 'red' });
+
+        // this.screenCanvas.dom({
+        //     name     : 'aaa',
+        //     position : [0, 0],
+        //     img      : circleCtx.canvas,
+        //     zoom     : 0
+        // });
+
+        this.screenCanvas.dom({
+            name     : 'bbb',
+            position : [40, 0],
+            radius   : 50,
+            size     : [50, 50],
+            bg       : 'yellow',
+            zoom     : 1
+        });
+
+
+        for (let i = 0; i < 20; i++) {
+
+            let snake = new Snake({
                 scene       : this,
-                isRobot     : i !== 0,
                 snakesIndex : i
-            }));
+            });
+
+            this.snakes.push(snake);
+
             // for (let index = 0; index < 5; index++) {
             //     this.foods.push(new Food({ scene: this }));
             // }
         }
 
         // 顶层遮罩
-        this.mask = this.dom({
+        this.mask = this.screenCanvas.dom({
             name: 'mask',
             // // position     : [['left', 20], ['bottom', -20]],
             // // size         : [100, 100],
             // // radius       : 100,
 
-            size     : this.ctx.test ? this.bgDom.size : ['full', 'full'],
-            position : this.ctx.test ? this.bgDom.position : ['center', 'top'],
+            size     : this.bgDom.size,
+            position : this.bgDom.position,
 
             bg           : 'rgba(0,0,0,0.1)',
             zoom         : 99999,
@@ -68,8 +93,8 @@ module.exports = class Main extends Base {
 
                 let { sin, cos } = computerOffset([e.touches[0].clientX, e.touches[0].clientY], [this.moveOffset.touches[0].clientX, this.moveOffset.touches[0].clientY]);
 
-                if (sin) self.snakes[0].moveSinCos[0] = sin * self.snakes[0].speed;
-                if (cos) self.snakes[0].moveSinCos[1] = cos * self.snakes[0].speed;
+                if (sin) self.snakes[0].moveSinCos[0] = sin;
+                if (cos) self.snakes[0].moveSinCos[1] = cos;
 
                 this.moveOffset = e;
             },
@@ -78,18 +103,18 @@ module.exports = class Main extends Base {
                 this.moveOffset = { touches: [] };
             }
         });
+
+        // test
+        // this.screenCanvas.ctx.translate(900, 800); // 镜头反方向移动
     }
 
     // 每帧更新方法
     update() {
 
-        let timeFlag = false;
-
         // 每秒钟可以干的事情。。。
-        let runSecond = parseInt(this.DOMHighResTimeStamp / 50);
+        let runSecond = parseInt(this.DOMHighResTimeStamp / 100);
         if (runSecond > this.runSecond) {
             this.runSecond = runSecond;
-            timeFlag = true;
             // console.log(this.runSecond);
             // if (runSecond > 10) self.snakeEVO();
         }
@@ -106,13 +131,11 @@ module.exports = class Main extends Base {
         // 蛇自动移动
         for (let i = 0; i < this.snakes.length; i++) {
             const snake = this.snakes[i];
-            snake.autoMove(timeFlag);
+            snake.autoMove();
         }
 
-        if (!this.ctx.test) {
-            this.camera.move(player.moveSinCos, player.snakeBodys[0], this.bgDom);
-            this.mask.position = this.ctx.canvasOffset; // 背景图固定
-        }
+        this.camera.move(player, this.bgDom);
+        this.mask.position = this.screenCanvas.ctx.canvasOffset; // 背景图固定
     }
 
     // 终止游戏
@@ -125,10 +148,3 @@ module.exports = class Main extends Base {
         });
     }
 };
-
-function computerOffset(posA, posB) {
-    let x = posA[0] - posB[0];
-    let y = posA[1] - posB[1];
-    let z = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-    return { sin: x / z, cos: y / z, z };
-}
