@@ -31,22 +31,24 @@ module.exports = class Main extends Base {
             zoom     : -1
         });
 
-        // // test
-        // if (window.test) this.screenCanvas.ctx.translate(900, 800); // 镜头反方向移动
         this.screenCanvas.ctx.bgWH = this.bgDom.size;
-        let x = this.screenCanvas.ctx.bgWH[0] / 2 - this.screenCanvas.ctx.canvasInnerWH[0] / 2;
-        let y = this.screenCanvas.ctx.bgWH[1] / 2 - this.screenCanvas.ctx.canvasInnerWH[1] / 2;
-        this.screenCanvas.ctx.canvasOffset = [x, y];
-        this.screenCanvas.ctx.translate(x * -1, y * -1);
 
-        // // 食物层
-        // this.foodCanvas = this.screenCanvas.dom({
-        //     name     : 'foodCanvas',
-        //     size     : this.bgDom.size,
-        //     position : [0, 0],
-        //     subCtx   : new FoodCanvas({ scene: this }).ctx,
-        //     zoom     : 0
-        // });
+        // test
+        if (!window.test) {
+            let x = this.screenCanvas.ctx.bgWH[0] / 2 - this.screenCanvas.ctx.canvasInnerWH[0] / 2;
+            let y = this.screenCanvas.ctx.bgWH[1] / 2 - this.screenCanvas.ctx.canvasInnerWH[1] / 2;
+            this.screenCanvas.ctx.canvasOffset = [x, y];
+            this.screenCanvas.ctx.translate(x * -1, y * -1);
+        }
+
+        // 食物层
+        this.foodCanvas = this.screenCanvas.dom({
+            name     : 'foodCanvas',
+            size     : this.bgDom.size,
+            position : [0, 0],
+            subCtx   : new FoodCanvas({ scene: this }).ctx,
+            zoom     : 0
+        });
 
         for (let i = 0; i < 1; i++) {
 
@@ -146,7 +148,7 @@ module.exports = class Main extends Base {
 
     // 终止游戏
     stopGame(str = '游戏结束！') {
-        // this.gameStatus = 3;
+        this.gameStatus = 3;
         wx.showToast({
             title    : str,
             icon     : 'success',
