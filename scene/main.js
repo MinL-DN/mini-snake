@@ -116,7 +116,6 @@ module.exports = class Main extends Base {
         if (runSecond > this.runSecond) {
             this.runSecond = runSecond;
             // console.log(this.runSecond);
-            // if (runSecond > 10) self.snakeEVO();
         }
 
         if (this.gameStatus !== 2) return;

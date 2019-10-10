@@ -1,4 +1,4 @@
-// snake 类
+// 食物奖品类
 
 const Dom = require('../utils/dom');
 const { getGuid } = require('../utils/index');

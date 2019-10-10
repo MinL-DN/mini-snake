@@ -7,8 +7,9 @@ module.exports = class Dom {
 
         // 渲染img
         params.img = params.img || window.resources[params.imgSrc];
-        if (params.img) {
+        if (params.img && !params.size) {
             params.size = [params.img.width, params.img.height];
+            // params.size = params.img.tagName == 'CANVAS' ? [] : [params.img.width, params.img.height];
         }
 
         if (params.text) {
@@ -28,7 +29,7 @@ module.exports = class Dom {
 
         Object.assign(
             this,
-            { border: 0, radius: 0, text: '', textStyle: {}, fontSize: 0 },
+            { border: 0, borderColor: '#000', radius: 0, text: '', textStyle: {}, fontSize: 0 },
             params,
             {
                 ctx, size, position,
@@ -62,15 +63,21 @@ module.exports = class Dom {
         if (this.img) {
             ctx.drawImage(this.img, this.position[0], this.position[1], this.size[0], this.size[1]);
         } else if (this.text || typeof this.bg == 'string') { // 文字以及纯色 bg 绘画
+
             if (this.bg) {
 
-                ctx.strokeStyle = this.bg;
                 ctx.fillStyle = this.bg;
 
                 if (this.radius) {
                     this.drawRoundRect('bg', this.position[0], this.position[1], this.size[0], this.size[1], this.radius);
                 } else {
                     ctx.fillRect(this.position[0], this.position[1], this.size[0], this.size[1]);
+                }
+
+                if (this.border) {
+                    ctx.lineWidth = this.border;
+                    ctx.strokeStyle = this.borderColor;
+                    this.drawRoundRect('border', this.position[0] + this.border / 2, this.position[1] + this.border / 2, this.size[0] - this.border, this.size[1] - this.border, this.radius - this.border);
                 }
             }
             if (this.text) {

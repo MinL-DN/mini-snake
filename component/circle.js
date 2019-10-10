@@ -11,7 +11,7 @@ const Canvas = require('../utils/canvas');
  */
 module.exports = function(params) {
 
-    let { radius, color } = params;
+    let { radius, color, border } = params;
 
     // 离屏渲染
     const circleCanvas = new Canvas('circle', [radius, radius]);
@@ -22,6 +22,7 @@ module.exports = function(params) {
         position : ['center', 'center'],
         size     : [radius, radius],
         radius   : radius,
+        border,
         zoom     : 1
     });
 
