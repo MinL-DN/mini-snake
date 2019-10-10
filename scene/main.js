@@ -2,7 +2,7 @@
 const Base = require('./index');
 const Snake = require('../component/snake');
 const Camera = require('../component/camera');
-const FoodCanvas = require('../component/food');
+const FoodCanvas = require('../component/food-canvas');
 
 const { computerOffset } = require('../utils/index');
 
@@ -42,12 +42,12 @@ module.exports = class Main extends Base {
         }
 
         // 食物层
-        this.foodCanvas = this.screenCanvas.dom({
-            name     : 'foodCanvas',
-            size     : this.bgDom.size,
-            position : [0, 0],
-            subCtx   : new FoodCanvas({ scene: this }).ctx,
-            zoom     : 0
+        this.foodSubCanvasDom = this.screenCanvas.dom({
+            name      : 'foodSubCanvas',
+            size      : this.bgDom.size,
+            position  : [0, 0],
+            subCanvas : new FoodCanvas({ scene: this }),
+            zoom      : 0
         });
 
         for (let i = 0; i < 1; i++) {
@@ -91,7 +91,6 @@ module.exports = class Main extends Base {
                 this.moveOffset = { touches: [] };
             }
         });
-
     }
 
     // 根据背景图的大小决定游戏活动范围
@@ -142,7 +141,9 @@ module.exports = class Main extends Base {
             snake.autoMove();
         }
 
-        this.camera.move(player, this.limitArea(0));
+        if (!window.test) {
+            this.camera.move(player, this.limitArea(0));
+        }
         this.mask.position = this.screenCanvas.ctx.canvasOffset; // 背景图固定
     }
 

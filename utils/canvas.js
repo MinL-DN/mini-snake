@@ -41,7 +41,8 @@ function antiAliasing(ctx) {
     let width = ctx.canvas.width;
     let height = ctx.canvas.height;
 
-    let pixel = wx.getSystemInfoSync().devicePixelRatio;
+    // let pixel = wx.getSystemInfoSync().devicePixelRatio;
+    let pixel = 2; // 最大支持canvas宽度4096。。。你敢信？？？
 
     if (pixel && pixel != 1) {
         // ctx.canvas.style.width = width + 'px';

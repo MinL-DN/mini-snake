@@ -6,9 +6,10 @@ module.exports = class Dom {
     constructor(params, ctx) {
 
         // 渲染img
-        params.img = params.subCtx ? params.subCtx.canvas : params.img || window.resources[params.imgSrc];
+        let subCtx = params.subCanvas ? params.subCanvas.ctx : undefined;
+        params.img = subCtx ? subCtx.canvas : params.img || window.resources[params.imgSrc];
         if (!params.size) {
-            params.size = params.subCtx ? params.subCtx.canvasInnerWH : params.img ? [params.img.width, params.img.height] : undefined;
+            params.size = subCtx ? subCtx.canvasInnerWH : params.img ? [params.img.width, params.img.height] : undefined;
         }
 
         if (params.text) {
@@ -36,7 +37,7 @@ module.exports = class Dom {
             }
         );
 
-        this.render();
+        if (this.zoom) this.render();
     }
 
     render() {

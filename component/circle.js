@@ -28,5 +28,5 @@ module.exports = function(params) {
         zoom     : 1
     });
 
-    return circle.ctx;
+    return circle;
 };

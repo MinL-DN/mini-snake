@@ -78,8 +78,8 @@ module.exports = class Snake {
             //     v.size = JSON.parse(JSON.stringify(imgCtx.canvasInnerWH));
             // }
 
-            v.img = this.circleCtx.canvas;
-            v.size = JSON.parse(JSON.stringify(this.circleCtx.canvasInnerWH));
+            v.img = this.circlePage.ctx.canvas;
+            v.size = JSON.parse(JSON.stringify(this.circlePage.ctx.canvasInnerWH));
             v.zoom = (prevSnake ? prevSnake.snakeBodys[0].zoom : 0) + this.snakeBodys.length - i;
 
             if (v.moveTime == DELAY) {
@@ -100,33 +100,45 @@ module.exports = class Snake {
                 }
             }
 
-            // // 蛇头碰撞逻辑
-            // // 与其他蛇碰撞
-            // for (let j = 0; j < this.scene.snakes.length; j++) {
+            if (i == 0) {
 
-            //     const snake = this.scene.snakes[j];
-            //     if (snake.snakeId == this.snakeId) continue;
+                // // 蛇头碰撞逻辑
+                // // 与其他蛇碰撞
+                // for (let j = 0; j < this.scene.snakes.length; j++) {
 
-            //     let { z } = computerOffset(snake.snakeBodys[0].position, v.position);
-            //     if (z <= v.size[0]) {
-            //         if (!snake.isRobot) { // 玩家蛇碰撞
-            //             // console.log(`snake ${snake.snakeId} hit ${this.snakeId}`);
-            //         }
-            //     }
-            // }
+                //     const snake = this.scene.snakes[j];
+                //     if (snake.snakeId == this.snakeId) continue;
 
-            //  // 与食物碰撞
-            //  for (let j = 0; j < this.scene.foods.length; j++) {
-            //      const food = this.scene.foods[j];
-            //      let { z } = computerOffset(food.position, v.position);
-            //      if (z < this.radius / 2) {
-            //          food.beEaten();
-            //          this.(this.moveSinCos);
-            //          // for (let index = 0; index < 5; index++) {
-            //          //     this.(this.moveSinCos);
-            //          // }
-            //      }
-            //  }
+                //     let { z } = computerOffset(snake.snakeBodys[0].position, v.position);
+                //     if (z <= v.size[0]) {
+                //         if (!snake.isRobot) { // 玩家蛇碰撞
+                //         // console.log(`snake ${snake.snakeId} hit ${this.snakeId}`);
+                //         }
+                //     }
+                // }
+
+                // 与食物碰撞
+                for (let j = 0; j < this.scene.foodSubCanvasDom.subCanvas.doms.length; j++) {
+                    const food = this.scene.foodSubCanvasDom.subCanvas.doms[j];
+
+                    if (!/food-/.test(food.name)) continue;
+
+                    let { z } = computerOffset([
+                        food.position[0] + food.size[0] / 2,
+                        food.position[1] + food.size[1] / 2
+                    ], [
+                        v.position[0] + food.size[0] / 2,
+                        v.position[1] + food.size[1] / 2
+                    ]);
+                    // let { z } = computerOffset(food.position, v.position);
+
+                    if (z < (this.radius + food.size[0] / 2) / 2) {
+                        this.scene.foodSubCanvasDom.subCanvas.reRender(food);
+                        this.snakeLen++;
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -154,7 +166,7 @@ module.exports = class Snake {
             // this.snakeColor = new GradientColor(...this.colors, _l);
 
             let circlePage = window.canvasPage.find(v => v.canvasName == 'circle' && v.doms[0].radius == self.radius && v.doms[0].color == self.colors);
-            this.circleCtx = circlePage ? circlePage.ctx : new Circle({ radius: this.radius, color: this.colors[0], border: 1 });
+            this.circlePage = circlePage || new Circle({ radius: this.radius, color: this.colors[0], border: 1 });
 
             let position = [0, 0];
 
@@ -168,7 +180,8 @@ module.exports = class Snake {
             }
 
             let snakeB = self.scene.screenCanvas.dom({
-                name: `snake-${self.snakeBodys.length.toString().padStart(5, 0)}-${self.snakeId}`,
+                name      : `snake-${self.snakeBodys.length.toString().padStart(5, 0)}-${self.snakeId}`,
+                subCanvas : this.circlePage,
                 position
             });
 

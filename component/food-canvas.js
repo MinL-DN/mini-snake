@@ -14,10 +14,9 @@ module.exports = class FoodCanvas extends Canvas {
         super('food', params.scene.bgDom.size);
 
         this.scene = params.scene;
-        this.foods = [];
 
         for (let i = 0; i < 50; i++) {
-            this.foods.push(this.createFood());
+            this.createFood();
         }
     }
 
@@ -30,26 +29,30 @@ module.exports = class FoodCanvas extends Canvas {
         let circlePage = window.canvasPage.find(v => v.canvasName == 'circle' && v.doms[0].radius == radius && v.doms[0].color == color);
         let circleCtx = circlePage ? circlePage.ctx : new Circle({ radius, color });
 
-        // this.scene.screenCanvas.dom({
-        //     name     : '1',
-        //     subCtx   : circleCtx,
+        // this.dom({
         //     position : [0, 0],
-        //     zoom     : 100
+        //     size     : [500, 500],
+        //     bg       : 'rgba(255,0,0,0.1)',
+        //     zoom     : -1
         // });
 
         // 生成食物段实例
         this.dom({
-            name     : `food-${getGuid()}`,
-            position : xy,
-            subCtx   : circleCtx,
-            zoom     : this.foods.length + 1
+            name      : `food-${getGuid()}`,
+            position  : xy,
+            subCanvas : circleCtx,
+            zoom      : this.doms.length + 1
         });
     }
 
-    // 销毁自身
-    beEaten() {
-        let self = this;
-        self.scene.foods = self.scene.foods.filter(food => food.domId != self.domId);
-        self.scene.doms = self.scene.doms.filter(dom => dom.domId != self.domId);
+    // 重渲染
+    reRender(food) {
+
+        let size = food.size[0] / 2;
+        this.ctx.clearRect(...food.position, ...food.size); // 清除上一局的动画
+        console.log('clear');
+        food.position = this.scene.randomCoordinates(size);
+        food.render();
+        console.log('re render');
     }
 };
