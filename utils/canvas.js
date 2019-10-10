@@ -18,7 +18,7 @@ module.exports = class Canvas {
         antiAliasing(ctx);
 
         // test
-        // if (name == 'screen') ctx.scale(1 / 6, 1 / 6);
+        if (name == 'screen' && window.test) ctx.scale(1 / 6, 1 / 6);
 
         this.canvasName = name || '';
         this.doms = [];

@@ -6,10 +6,9 @@ module.exports = class Dom {
     constructor(params, ctx) {
 
         // 渲染img
-        params.img = params.img || window.resources[params.imgSrc];
-        if (params.img && !params.size) {
-            params.size = [params.img.width, params.img.height];
-            // params.size = params.img.tagName == 'CANVAS' ? [] : [params.img.width, params.img.height];
+        params.img = params.subCtx ? params.subCtx.canvas : params.img || window.resources[params.imgSrc];
+        if (!params.size) {
+            params.size = params.subCtx ? params.subCtx.canvasInnerWH : params.img ? [params.img.width, params.img.height] : undefined;
         }
 
         if (params.text) {
@@ -46,6 +45,7 @@ module.exports = class Dom {
 
         // 超出屏幕不渲染
         if (
+            !window.test &&
             ctx.canvasOffset && this.size[0] < ctx.canvasInnerWH[0] && this.size[1] < ctx.canvasInnerWH[1] &&
             (
                 this.position[0] + this.size[0] < ctx.canvasOffset[0] ||

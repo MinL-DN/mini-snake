@@ -2,44 +2,40 @@
 
 const Dom = require('../utils/dom');
 const { getGuid } = require('../utils/index');
+const Circle = require('./circle');
 
 const COLORS = ['#00fffa', '#009aff', '#005fff', '#1700ff', '#8c00ff', '#eb00ff', '#ff00aa', '#ff0092', '#00ffee', '#ff007a'];
 
-module.exports = class Food extends Dom {
+module.exports = function(params) {
+    let radius = 20;
 
-    constructor(params) {
+    // 计算界限
+    let limitArea = params.scene.limitArea(radius);
 
-        let baseRandom = parseInt(Math.random() * 10);
-        let radius = 20;
+    let x = Math.floor(Math.random() * (limitArea[0][1] - limitArea[0][0])) + limitArea[0][0];
+    let y = Math.floor(Math.random() * (limitArea[1][1] - limitArea[1][0])) + limitArea[1][0];
 
-        // 计算界限
-        let limitArea = [
-            [params.scene.limitArea[0][0], params.scene.limitArea[0][1] - radius],
-            [params.scene.limitArea[1][0], params.scene.limitArea[1][1] - radius]
-        ];
+    let circlePage = window.canvasPage.find(v => v.canvasName == 'circle' && v.doms[0].radius == self.radius && v.doms[0].color == self.colors);
+    let circleCtx = circlePage ? circlePage.ctx : new Circle({ radius: radius, color: COLORS[parseInt(Math.random() * 10)] });
 
-        let x = Math.floor(Math.random() * (limitArea[0][1] - limitArea[0][0])) + limitArea[0][0];
-        let y = Math.floor(Math.random() * (limitArea[1][1] - limitArea[1][0])) + limitArea[1][0];
-
-        // 生成食物段实例
-        let data = {
-            name     : `food-${getGuid()}`,
-            position : [x, y],
-            bg       : COLORS[baseRandom] || '#eee',
-            zoom     : 0,
-            size     : [radius, radius],
-            radius   : radius
-        };
-
-        super(data, params.scene);
-
-        params.scene.doms.push(this);
-    }
-
-    // 销毁自身
-    beEaten() {
-        let self = this;
-        self.scene.foods = self.scene.foods.filter(food => food.domId != self.domId);
-        self.scene.doms = self.scene.doms.filter(dom => dom.domId != self.domId);
-    }
+    // 生成食物段实例
+    params.scene.screenCanvas.dom({
+        name     : `food-${getGuid()}`,
+        position : [x, y],
+        subCtx   : circleCtx,
+        zoom     : 2
+    });
 };
+
+// class Food extends Dom {
+
+//     constructor(params) {
+//     }
+
+//     // 销毁自身
+//     beEaten() {
+//         let self = this;
+//         self.scene.foods = self.scene.foods.filter(food => food.domId != self.domId);
+//         self.scene.doms = self.scene.doms.filter(dom => dom.domId != self.domId);
+//     }
+// }

@@ -33,12 +33,6 @@ module.exports = class Main extends Base {
             zoom     : -1
         });
 
-        // 根据背景图的大小决定游戏活动范围 // 碰撞边界
-        this.limitArea = [
-            [this.bgDom.position[0], this.bgDom.position[0] + this.bgDom.size[0]],
-            [this.bgDom.position[1], this.bgDom.position[1] + this.bgDom.size[1]]
-        ];
-
         // let circleCtx = new Circle({ radius: 40, color: 'red' });
 
         // this.screenCanvas.dom({
@@ -58,7 +52,7 @@ module.exports = class Main extends Base {
         });
 
 
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 1; i++) {
 
             let snake = new Snake({
                 scene       : this,
@@ -66,10 +60,6 @@ module.exports = class Main extends Base {
             });
 
             this.snakes.push(snake);
-
-            // for (let index = 0; index < 5; index++) {
-            //     this.foods.push(new Food({ scene: this }));
-            // }
         }
 
         // 顶层遮罩
@@ -105,7 +95,16 @@ module.exports = class Main extends Base {
         });
 
         // test
-        // this.screenCanvas.ctx.translate(900, 800); // 镜头反方向移动
+        if (window.test) this.screenCanvas.ctx.translate(900, 800); // 镜头反方向移动
+    }
+
+    // 根据背景图的大小决定游戏活动范围
+    // 碰撞边界
+    limitArea(radius) {
+        return this.bgDom ? [
+            [this.bgDom.position[0], this.bgDom.position[0] + this.bgDom.size[0] - radius],
+            [this.bgDom.position[1], this.bgDom.position[1] + this.bgDom.size[1] - radius]
+        ] : [[0, 0], [0, 0]];
     }
 
     // 每帧更新方法

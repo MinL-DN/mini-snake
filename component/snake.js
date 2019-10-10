@@ -148,10 +148,7 @@ module.exports = class Snake {
             this.radius = _l / 4 + 25;
 
             // 计算界限
-            this.limitArea = [
-                [this.scene.limitArea[0][0], this.scene.limitArea[0][1] - this.radius],
-                [this.scene.limitArea[1][0], this.scene.limitArea[1][1] - this.radius]
-            ];
+            this.limitArea = this.scene.limitArea(this.radius);
 
             // // 蛇身渐变色
             // this.snakeColor = new GradientColor(...this.colors, _l);

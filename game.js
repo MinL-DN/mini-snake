@@ -11,6 +11,8 @@ const Main   = require('./scene/main');
 // 加载资源
 let loadRe = new LoadRe();
 
+// window.test = 1;
+
 loadRe.load().then(re => {
 
     window.resources = re;
