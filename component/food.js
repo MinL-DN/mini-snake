@@ -16,7 +16,7 @@ module.exports = class FoodCanvas extends Canvas {
         this.scene = params.scene;
         this.foods = [];
 
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < 50; i++) {
             this.foods.push(this.createFood());
         }
     }

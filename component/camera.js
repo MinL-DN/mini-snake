@@ -11,16 +11,16 @@ module.exports = class Camera {
         console.log('create a camera');
         this.cameraId = getGuid();
         this.ctx = ctx;
-        this.ctx.canvasOffset = [0, 0];
+        this.ctx.canvasOffset = this.ctx.canvasOffset || [0, 0];
     }
 
     /**
      * 每帧更新方法
      *
      * @param {Dom} player 玩家
-     * @param {Dom} limitTarget 边框限制区域
+     * @param {Dom} limitArea 边框限制区域
      */
-    move(player, limitTarget) {
+    move(player, limitArea) {
 
         // 横纵轴处理逻辑类似，此处用for循环处理，简化代码 0：X轴 1：Y轴
         for (let i = 0; i < 2; i++) {
@@ -31,7 +31,7 @@ module.exports = class Camera {
 
             let snakeHeadPos  = player.snakeBodys[0].position[i] + tri; // 蛇头坐标
             let bgMoveArea    = [cOffset + WrapperMargin, cOffset + SCREEN[i] - WrapperMargin - player.snakeBodys[0].size[i]]; // 背景移动边界
-            let bgLimit       = [(SCREEN[i] - limitTarget.size[i]) / 2 - WrapperMargin, (limitTarget.size[i] + SCREEN[i]) / 2 + WrapperMargin]; // 摄像头移动边界
+            let bgLimit       = [limitArea[i][0] - WrapperMargin, limitArea[i][1] + SCREEN[i] + WrapperMargin]; // 摄像头移动边界
 
             // 摄像头移动逻辑
             if (

@@ -54,7 +54,7 @@ module.exports = class Dom {
                 this.position[1] - this.size[1] > ctx.canvasOffset[1] + ctx.canvasInnerWH[1]
             )
         ) {
-            // return;
+            return;
         }
 
         ctx.save();

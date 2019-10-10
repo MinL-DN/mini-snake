@@ -67,8 +67,8 @@ module.exports = class Main extends Base {
             // // size         : [100, 100],
             // // radius       : 100,
 
-            size     : this.bgDom.size,
-            position : this.bgDom.position,
+            size     : ['full', 'full'],
+            position : ['center', 'center'],
 
             bg           : 'rgba(0,0,0,0.1)',
             zoom         : 99999,
@@ -98,7 +98,7 @@ module.exports = class Main extends Base {
     // 碰撞边界
     limitArea(radius) {
 
-        if (!radius) console.log('limitArea no raduis');
+        if (radius === undefined) console.log('limitArea no raduis');
 
         return this.bgDom ? [
             [this.bgDom.position[0], this.bgDom.position[0] + this.bgDom.size[0] - radius],
@@ -142,8 +142,8 @@ module.exports = class Main extends Base {
             snake.autoMove();
         }
 
-        // this.camera.move(player, this.bgDom);
-        // this.mask.position = this.screenCanvas.ctx.canvasOffset; // 背景图固定
+        this.camera.move(player, this.limitArea(0));
+        this.mask.position = this.screenCanvas.ctx.canvasOffset; // 背景图固定
     }
 
     // 终止游戏
