@@ -163,9 +163,8 @@ module.exports = class Snake {
             if (prev) {
                 position = JSON.parse(JSON.stringify(prev.position));
             } else {
-                let x = Math.floor(Math.random() * (self.limitArea[0][1] - self.limitArea[0][0])) + self.limitArea[0][0];
-                let y = Math.floor(Math.random() * (self.limitArea[1][1] - self.limitArea[1][0])) + self.limitArea[1][0];
-                position = self.isRobot ? [x, y] : ['center', 'center'];
+                let xy = this.scene.randomCoordinates(this.radius);
+                position = self.isRobot ? xy : ['center', 'center'];
             }
 
             let snakeB = self.scene.screenCanvas.dom({

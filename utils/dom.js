@@ -54,7 +54,7 @@ module.exports = class Dom {
                 this.position[1] - this.size[1] > ctx.canvasOffset[1] + ctx.canvasInnerWH[1]
             )
         ) {
-            return;
+            // return;
         }
 
         ctx.save();
@@ -95,6 +95,7 @@ module.exports = class Dom {
     computeOffset(ctx, values = [], type = 'position', size = []) {
 
         let canvasWH = ctx.canvasInnerWH;
+        let bgWH = ctx.bgWH || canvasWH;
 
         let result = [];
 
@@ -110,11 +111,11 @@ module.exports = class Dom {
 
             if (type == 'position') {
                 if (value == 'center') {
-                    value = (canvasWH[i] - size[i]) / 2 + offset;
+                    value = (bgWH[i] - size[i]) / 2 + offset;
                 } else if (value == 'left' && i == 0 || value == 'top' && i == 1) {
                     value = 0 + offset;
                 } else if (value == 'right' && i == 0 || value == 'bottom' && i == 1) {
-                    value = canvasWH[i] - size[i] + offset;
+                    value = bgWH[i] - size[i] + offset;
                 }
             } else {
                 if (value == 'full') {

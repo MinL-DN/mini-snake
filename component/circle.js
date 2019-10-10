@@ -13,6 +13,8 @@ module.exports = function(params) {
 
     let { radius, color, border } = params;
 
+    if (!radius) console.log('circle no raduis');
+
     // 离屏渲染
     const circleCanvas = new Canvas('circle', [radius, radius]);
 

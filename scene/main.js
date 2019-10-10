@@ -2,20 +2,18 @@
 const Base = require('./index');
 const Snake = require('../component/snake');
 const Camera = require('../component/camera');
-const Food = require('../component/food');
-const Circle = require('../component/circle');
+const FoodCanvas = require('../component/food');
 
 const { computerOffset } = require('../utils/index');
-
 
 module.exports = class Main extends Base {
 
     constructor() {
         super();
+
         console.log('this main');
         this.runSecond = 0;
         this.snakes = [];
-        this.foods = [];
         this.buildDom(); // 实例化蛇等
         this.camera = new Camera(this.screenCanvas.ctx); // 实例化摄像机
         this.gameStatus = 2; // 1、待机 2、进行 3、游戏结束
@@ -28,29 +26,27 @@ module.exports = class Main extends Base {
         // 背景图
         this.bgDom = this.screenCanvas.dom({
             name     : 'bg',
-            position : ['center', 'center'],
+            position : [0, 0],
             imgSrc   : 'public/images/bg.jpg',
             zoom     : -1
         });
 
-        // let circleCtx = new Circle({ radius: 40, color: 'red' });
+        // // test
+        // if (window.test) this.screenCanvas.ctx.translate(900, 800); // 镜头反方向移动
+        this.screenCanvas.ctx.bgWH = this.bgDom.size;
+        let x = this.screenCanvas.ctx.bgWH[0] / 2 - this.screenCanvas.ctx.canvasInnerWH[0] / 2;
+        let y = this.screenCanvas.ctx.bgWH[1] / 2 - this.screenCanvas.ctx.canvasInnerWH[1] / 2;
+        this.screenCanvas.ctx.canvasOffset = [x, y];
+        this.screenCanvas.ctx.translate(x * -1, y * -1);
 
-        // this.screenCanvas.dom({
-        //     name     : 'aaa',
+        // // 食物层
+        // this.foodCanvas = this.screenCanvas.dom({
+        //     name     : 'foodCanvas',
+        //     size     : this.bgDom.size,
         //     position : [0, 0],
-        //     img      : circleCtx.canvas,
+        //     subCtx   : new FoodCanvas({ scene: this }).ctx,
         //     zoom     : 0
         // });
-
-        this.screenCanvas.dom({
-            name     : 'bbb',
-            position : [40, 0],
-            radius   : 50,
-            size     : [50, 50],
-            bg       : 'yellow',
-            zoom     : 1
-        });
-
 
         for (let i = 0; i < 1; i++) {
 
@@ -94,17 +90,29 @@ module.exports = class Main extends Base {
             }
         });
 
-        // test
-        if (window.test) this.screenCanvas.ctx.translate(900, 800); // 镜头反方向移动
     }
 
     // 根据背景图的大小决定游戏活动范围
     // 碰撞边界
     limitArea(radius) {
+
+        if (!radius) console.log('limitArea no raduis');
+
         return this.bgDom ? [
             [this.bgDom.position[0], this.bgDom.position[0] + this.bgDom.size[0] - radius],
             [this.bgDom.position[1], this.bgDom.position[1] + this.bgDom.size[1] - radius]
         ] : [[0, 0], [0, 0]];
+    }
+
+    // 生成随机点
+    randomCoordinates(radius) {
+
+        let limitArea = this.limitArea(radius);
+
+        let x = Math.floor(Math.random() * (limitArea[0][1] - limitArea[0][0])) + limitArea[0][0];
+        let y = Math.floor(Math.random() * (limitArea[1][1] - limitArea[1][0])) + limitArea[1][0];
+
+        return [x, y];
     }
 
     // 每帧更新方法
@@ -132,8 +140,8 @@ module.exports = class Main extends Base {
             snake.autoMove();
         }
 
-        this.camera.move(player, this.bgDom);
-        this.mask.position = this.screenCanvas.ctx.canvasOffset; // 背景图固定
+        // this.camera.move(player, this.bgDom);
+        // this.mask.position = this.screenCanvas.ctx.canvasOffset; // 背景图固定
     }
 
     // 终止游戏
