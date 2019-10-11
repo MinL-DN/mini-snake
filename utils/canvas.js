@@ -13,7 +13,7 @@ module.exports = class Canvas {
      */
     constructor(params) {
 
-        let { name, wh, _canvas, isAnti = true } = params;
+        let { name, wh, _canvas } = params;
 
         _canvas = _canvas || wx.createCanvas();
 
@@ -27,7 +27,7 @@ module.exports = class Canvas {
         ctx.canvasInnerWH = wh || [ctx.canvas.width, ctx.canvas.height];
 
         // canvas 抗锯齿
-        if (isAnti) antiAliasing(ctx);
+        antiAliasing(ctx);
 
         // test
         if (name == 'screen' && window.test) ctx.scale(1 / 6, 1 / 6);
@@ -50,8 +50,7 @@ module.exports = class Canvas {
 
 function antiAliasing(ctx) {
 
-    let width = ctx.canvas.width;
-    let height = ctx.canvas.height;
+    let wh = [ctx.canvas.width, ctx.canvas.height];
 
     let devicePixelRatio = wx.getSystemInfoSync().devicePixelRatio || 1;
     let backingStoreRatio = ctx.webkitBackingStorePixelRatio ||
@@ -59,14 +58,22 @@ function antiAliasing(ctx) {
         ctx.msBackingStorePixelRatio ||
         ctx.oBackingStorePixelRatio ||
         ctx.backingStorePixelRatio || 1;
-    let pixel = devicePixelRatio / backingStoreRatio;
-    // let pixel = 2; // 最大支持canvas宽度4096。。。你敢信？？？
 
-    if (pixel && pixel != 1) {
-        ctx.canvas.style.width = width + 'px';
-        ctx.canvas.style.height = height + 'px';
-        ctx.canvas.width = width * pixel;
-        ctx.canvas.height = height * pixel;
-        ctx.scale(pixel, pixel);
+    let pixel = devicePixelRatio / backingStoreRatio;
+
+    pixel = [pixel, pixel];
+
+    for (let i = 0; i < 2; i++) { // 0、x 1、y
+        let key = i === 0 ? 'width' : 'height';
+        ctx.canvas.style[key] = wh[i] + 'px';
+        ctx.canvas[key] = ctx.canvas[key] * pixel[i];
+
+        // canvas存在最大宽高，需要以此来做缩放 ios 微信 4096
+        let up = Math.ceil(ctx.canvasInnerWH[i]);
+        if (ctx.canvas[key] != up * pixel[i]) {
+            pixel[i] = ctx.canvas[key] / up;
+        }
     }
+
+    ctx.scale(...pixel);
 }

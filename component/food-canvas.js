@@ -12,9 +12,8 @@ module.exports = class FoodCanvas extends Canvas {
     constructor(params) {
 
         super({
-            name   : 'food',
-            wh     : params.scene.bgDom.size,
-            isAnti : false
+            name : 'food',
+            wh   : params.scene.bgDom.size
         });
 
         this.scene = params.scene;
