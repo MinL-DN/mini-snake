@@ -78,7 +78,7 @@ module.exports = class Dom {
                 if (this.border) {
                     ctx.lineWidth = this.border;
                     ctx.strokeStyle = this.borderColor;
-                    this.drawRoundRect('border', this.position[0] + this.border / 2, this.position[1] + this.border / 2, this.size[0] - this.border, this.size[1] - this.border, this.radius - this.border);
+                    this.drawRoundRect('border', this.position[0] + this.border / 2, this.position[1] + this.border / 2, this.size[0] - this.border, this.size[0] - this.border, this.size[1] - this.border);
                 }
             }
             if (this.text) {

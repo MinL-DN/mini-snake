@@ -11,7 +11,11 @@ module.exports = class FoodCanvas extends Canvas {
 
     constructor(params) {
 
-        super('food', params.scene.bgDom.size);
+        super({
+            name   : 'food',
+            wh     : params.scene.bgDom.size,
+            isAnti : false
+        });
 
         this.scene = params.scene;
 
@@ -47,12 +51,9 @@ module.exports = class FoodCanvas extends Canvas {
 
     // 重渲染
     reRender(food) {
-
         let size = food.size[0] / 2;
         this.ctx.clearRect(...food.position, ...food.size); // 清除上一局的动画
-        console.log('clear');
         food.position = this.scene.randomCoordinates(size);
         food.render();
-        console.log('re render');
     }
 };

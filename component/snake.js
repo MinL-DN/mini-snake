@@ -157,6 +157,7 @@ module.exports = class Snake {
         for (let i = 0; i < subtract; i++) {
             let _l = this.snakeBodys.length + 1;
             // 根据蛇长算出蛇宽度
+            // this.radius = 27.5;
             this.radius = _l / 4 + 25;
 
             // 计算界限

@@ -17,7 +17,7 @@ loadRe.load().then(re => {
 
     window.resources = re;
 
-    new Canvas('screen', '', canvas);
+    new Canvas({ name: 'screen', _canvas: canvas });
 
     // 开启主页
     new Main();
