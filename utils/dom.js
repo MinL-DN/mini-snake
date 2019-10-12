@@ -6,7 +6,7 @@ module.exports = class Dom {
     constructor(params, ctx) {
 
         // 渲染img
-        params.img = params.subCtx ? params.subCtx.canvas : params.img || window.resources[params.imgSrc];
+        params.img = params.subCtx ? params.subCtx.canvas : params.img || window.resourceCtrl.re[params.imgSrc];
         if (!params.size) {
             params.size = params.subCtx ? params.subCtx.canvasInnerWH : params.img ? [params.img.width, params.img.height] : undefined;
         }

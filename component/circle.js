@@ -1,29 +1,30 @@
-
 const Canvas = require('../utils/canvas');
 
-const circlePool = [];
+const circlePool = {};
 
 /**
  * 离屏渲染基础圆
  *
  * @param {*} params
  * @param {*} params.radius
- * @param {*} params.color
+ * @param {*} params.radius
+ * @param {*} params.border
  * @returns
  */
 module.exports = function(params) {
 
     let { radius = 0, color = '#000000', border = 0 } = params;
 
-    if (!radius) console.log('circle no raduis');
+    if (!radius) return console.log('circle no raduis');
 
-    let key = `${radius}-${color}-${border}`;
+    let key = `circle-${radius}-${color}-${border}`;
 
     if (!circlePool[key]) {
         // 离屏渲染
         let circleCanvas = new Canvas({
-            name : 'circle',
-            wh   : [radius, radius]
+            name  : 'circle',
+            wh    : [radius, radius],
+            toImg : true
         });
 
         // circleCanvas.dom({
@@ -33,7 +34,7 @@ module.exports = function(params) {
         //     zoom     : -1
         // });
 
-        circlePool[key] = circleCanvas.dom({
+        circleCanvas.dom({
             bg       : color,
             name     : 'base-circle',
             position : [0, 0],
@@ -42,7 +43,12 @@ module.exports = function(params) {
             border,
             zoom     : 1
         });
+
+        // 直接用离屏的canvas部分机型依旧存在掉帧现象，需要将canvas转为img再画上画布
+        window.resourceCtrl.add(key, circleCanvas.ctx.canvas.toDataURL());
+        circleCanvas.img = window.resourceCtrl.re[key];
+        circlePool[key] = circleCanvas;
     }
 
-    return circlePool[key].ctx;
+    return circlePool[key];
 };

@@ -26,13 +26,7 @@ module.exports = class Base {
         this.DOMHighResTimeStamp = e;
 
         screenCanvas.ctx.clearRect(...screenCanvas.ctx.canvasOffset || [0, 0], ...screenCanvas.ctx.canvasInnerWH); // 清除上一局的动画
-
-        let count = 0;
-        screenCanvas.doms.sort((a, b) => a.zoom - b.zoom > 0 ? 1 : -1).map(dom => {
-            let aa = dom.render();
-            if (aa == 'no render') count++;
-        }); // 计算dom动态
-        count;
+        screenCanvas.doms.sort((a, b) => a.zoom - b.zoom > 0 ? 1 : -1).map(dom => dom.render()); // 计算dom动态
 
         typeof this.update == 'function' && this.update(); // 每帧更新动画
 

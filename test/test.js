@@ -5,7 +5,7 @@ module.exports = class Scene {
         this.height = this.canvas.height;
         this.ctx = this.canvas.getContext('2d');
 
-        this.amount = 4000; // 粒子总数量
+        this.amount = 200; // 粒子总数量
         this.radius = 5; // 粒子半径
         this.particles = []; // 粒子集合
         this.speed = 10; // 粒子速度

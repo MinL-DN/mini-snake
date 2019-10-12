@@ -23,34 +23,13 @@ module.exports = class Main extends Base {
 
         let self = this;
 
-        // // 背景图
-        // this.screenCanvas.dom({
-        //     name     : 'bg-black',
-        //     bg       : '#000',
-        //     position : [-150, -150],
-        //     size     : [2300, 2300],
-        //     zoom     : -2
-        // });
-        // this.bgDom = this.screenCanvas.dom({
-        //     name     : 'bg',
-        //     position : [0, 0],
-        //     imgSrc   : 'public/images/bg.jpg',
-        //     zoom     : -1
-        // });
-
-        this.bgDom = {
-            bg          : "#000",
-            border      : 0,
-            borderColor : "#000",
-            domId       : "f783ead3-1a40-47d7-b2f1-65da8aa5a2ad",
-            fontSize    : 0,
-            img         : undefined,
-            name        : "bg-black",
-            position    : [0, 0],
-            radius      : 0,
-            size        : [2000, 2000],
-            zoom        : -2
-        };
+        // 背景图
+        this.bgDom = this.screenCanvas.dom({
+            name     : 'bg',
+            position : [0, 0],
+            imgSrc   : 'public/images/bg.jpg',
+            zoom     : -1
+        });
 
         this.screenCanvas.ctx.bgWH = this.bgDom.size;
 
@@ -71,7 +50,7 @@ module.exports = class Main extends Base {
             zoom     : 0
         });
 
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < 20; i++) {
 
             let snake = new Snake({
                 scene       : this,

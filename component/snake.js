@@ -18,7 +18,7 @@ module.exports = class Snake {
 
         Object.assign(this, {
             isRobot,
-            snakeLen   : 100,
+            snakeLen   : 10,
             speed      : 2.5,
             snakeId    : getGuid(),
             snakeBodys : [],
@@ -77,9 +77,8 @@ module.exports = class Snake {
             //     v.img = imgCtx.canvas;
             //     v.size = JSON.parse(JSON.stringify(imgCtx.canvasInnerWH));
             // }
+            // v.size = JSON.parse(JSON.stringify(this.circleCtx.canvasInnerWH));
 
-            v.img = this.circleCtx.canvas;
-            v.size = JSON.parse(JSON.stringify(this.circleCtx.canvasInnerWH));
             v.zoom = (prevSnake ? prevSnake.snakeBodys[0].zoom : 0) + this.snakeBodys.length - i;
 
             if (v.moveTime == DELAY) {
@@ -165,7 +164,7 @@ module.exports = class Snake {
             // // 蛇身渐变色
             // this.snakeColor = new GradientColor(...this.colors, _l);
 
-            this.circleCtx = getCircleImg({ radius: this.radius, color: this.colors[0], border: 1 });
+            this.circle = getCircleImg({ radius: this.radius, color: this.colors[0], border: 1 });
 
             let position = [0, 0];
 
@@ -179,8 +178,9 @@ module.exports = class Snake {
             }
 
             let snakeB = this.scene.screenCanvas.dom({
-                name   : `snake-${this.snakeBodys.length.toString().padStart(5, 0)}-${this.snakeId}`,
-                subCtx : this.circleCtx,
+                name : `snake-${this.snakeBodys.length.toString().padStart(5, 0)}-${this.snakeId}`,
+                img  : this.circle.img,
+                size : this.circle.ctx.canvasInnerWH,
                 position
             });
 
@@ -220,7 +220,6 @@ module.exports = class Snake {
         // }
 
         // 蛇各种属性计算
-        // snakeHead.position = JSON.parse(JSON.stringify(this.dshp));
         this.computeSnake();
     }
 };
