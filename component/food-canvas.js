@@ -2,7 +2,7 @@
 
 const Canvas = require('../utils/canvas');
 const { getGuid } = require('../utils/index');
-const Circle = require('./circle');
+const getCircleImg = require('./circle');
 
 const COLORS = ['#00fffa', '#009aff', '#005fff', '#1700ff', '#8c00ff', '#eb00ff', '#ff00aa', '#ff0092', '#00ffee', '#ff007a'];
 
@@ -18,7 +18,7 @@ module.exports = class FoodCanvas extends Canvas {
 
         this.scene = params.scene;
 
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 0; i++) {
             this.createFood();
         }
     }
@@ -29,8 +29,7 @@ module.exports = class FoodCanvas extends Canvas {
 
         let xy = this.scene.randomCoordinates(radius);
 
-        let circlePage = window.canvasPage.find(v => v.canvasName == 'circle' && v.doms[0].radius == radius && v.doms[0].color == color);
-        let circleCtx = circlePage ? circlePage.ctx : new Circle({ radius, color });
+        let circleCtx = getCircleImg({ radius, color });
 
         // this.dom({
         //     position : [0, 0],
@@ -41,10 +40,10 @@ module.exports = class FoodCanvas extends Canvas {
 
         // 生成食物段实例
         this.dom({
-            name      : `food-${getGuid()}`,
-            position  : xy,
-            subCanvas : circleCtx,
-            zoom      : this.doms.length + 1
+            name     : `food-${getGuid()}`,
+            position : xy,
+            subCtx   : circleCtx,
+            zoom     : this.doms.length + 1
         });
     }
 

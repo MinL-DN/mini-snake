@@ -23,13 +23,34 @@ module.exports = class Main extends Base {
 
         let self = this;
 
-        // 背景图
-        this.bgDom = this.screenCanvas.dom({
-            name     : 'bg',
-            position : [0, 0],
-            imgSrc   : 'public/images/bg.jpg',
-            zoom     : -1
-        });
+        // // 背景图
+        // this.screenCanvas.dom({
+        //     name     : 'bg-black',
+        //     bg       : '#000',
+        //     position : [-150, -150],
+        //     size     : [2300, 2300],
+        //     zoom     : -2
+        // });
+        // this.bgDom = this.screenCanvas.dom({
+        //     name     : 'bg',
+        //     position : [0, 0],
+        //     imgSrc   : 'public/images/bg.jpg',
+        //     zoom     : -1
+        // });
+
+        this.bgDom = {
+            bg          : "#000",
+            border      : 0,
+            borderColor : "#000",
+            domId       : "f783ead3-1a40-47d7-b2f1-65da8aa5a2ad",
+            fontSize    : 0,
+            img         : undefined,
+            name        : "bg-black",
+            position    : [0, 0],
+            radius      : 0,
+            size        : [2000, 2000],
+            zoom        : -2
+        };
 
         this.screenCanvas.ctx.bgWH = this.bgDom.size;
 
@@ -43,11 +64,11 @@ module.exports = class Main extends Base {
 
         // 食物层
         this.foodSubCanvasDom = this.screenCanvas.dom({
-            name      : 'foodSubCanvas',
-            size      : this.bgDom.size,
-            position  : [0, 0],
-            subCanvas : new FoodCanvas({ scene: this }),
-            zoom      : 0
+            name     : 'foodSubCanvas',
+            size     : this.bgDom.size,
+            position : [0, 0],
+            subCtx   : new FoodCanvas({ scene: this }),
+            zoom     : 0
         });
 
         for (let i = 0; i < 1; i++) {
@@ -70,7 +91,7 @@ module.exports = class Main extends Base {
             size     : ['full', 'full'],
             position : ['center', 'center'],
 
-            bg           : 'rgba(0,0,0,0.1)',
+            bg           : 'rgba(0,0,0,0)',
             zoom         : 99999,
             onTouchStart : function(e) {
                 this.moveOffset = e;

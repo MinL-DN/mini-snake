@@ -6,10 +6,9 @@ module.exports = class Dom {
     constructor(params, ctx) {
 
         // 渲染img
-        let subCtx = params.subCanvas ? params.subCanvas.ctx : undefined;
-        params.img = subCtx ? subCtx.canvas : params.img || window.resources[params.imgSrc];
+        params.img = params.subCtx ? params.subCtx.canvas : params.img || window.resources[params.imgSrc];
         if (!params.size) {
-            params.size = subCtx ? subCtx.canvasInnerWH : params.img ? [params.img.width, params.img.height] : undefined;
+            params.size = params.subCtx ? params.subCtx.canvasInnerWH : params.img ? [params.img.width, params.img.height] : undefined;
         }
 
         if (params.text) {
@@ -37,7 +36,7 @@ module.exports = class Dom {
             }
         );
 
-        if (this.zoom) this.render();
+        this.render();
     }
 
     render() {
@@ -46,6 +45,7 @@ module.exports = class Dom {
 
         // 超出屏幕不渲染
         if (
+            !this.zoom ||
             !window.test &&
             ctx.canvasOffset && this.size[0] < ctx.canvasInnerWH[0] && this.size[1] < ctx.canvasInnerWH[1] &&
             (
@@ -55,15 +55,15 @@ module.exports = class Dom {
                 this.position[1] - this.size[1] > ctx.canvasOffset[1] + ctx.canvasInnerWH[1]
             )
         ) {
-            return;
+            return 'no render';
         }
-
-        ctx.save();
 
         // 图片渲染
         if (this.img) {
             ctx.drawImage(this.img, this.position[0], this.position[1], this.size[0], this.size[1]);
         } else if (this.text || typeof this.bg == 'string') { // 文字以及纯色 bg 绘画
+
+            ctx.save();
 
             if (this.bg) {
 
@@ -87,9 +87,9 @@ module.exports = class Dom {
                 ctx.font = this.textStyle.font;
                 ctx.fillText(this.text, this.position[0], this.position[1] + this.fontSize / 2 + 2);
             }
-        }
 
-        ctx.restore();
+            ctx.restore();
+        }
     }
 
     // 计算相对屏幕的大小或者位置

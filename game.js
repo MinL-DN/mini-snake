@@ -3,7 +3,6 @@
 
 require('./utils/libs/weapp-adapter');
 require('./utils/libs/symbol');
-
 const LoadRe = require('./utils/loadRe');
 const Canvas = require('./utils/canvas');
 const Main   = require('./scene/main');
@@ -22,3 +21,12 @@ loadRe.load().then(re => {
     // 开启主页
     new Main();
 });
+
+// const test   = require('./test.js');
+
+// let aa = new test(canvas);
+
+// wx.onTouchStart(function() {
+//     aa.toggleRender();
+// });
+

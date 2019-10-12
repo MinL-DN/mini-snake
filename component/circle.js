@@ -1,6 +1,8 @@
 
 const Canvas = require('../utils/canvas');
 
+const circlePool = [];
+
 /**
  * 离屏渲染基础圆
  *
@@ -11,32 +13,36 @@ const Canvas = require('../utils/canvas');
  */
 module.exports = function(params) {
 
-    let { radius, color, border } = params;
+    let { radius = 0, color = '#000000', border = 0 } = params;
 
     if (!radius) console.log('circle no raduis');
 
-    // 离屏渲染
-    const circleCanvas = new Canvas({
-        name : 'circle',
-        wh   : [radius, radius]
-    });
+    let key = `${radius}-${color}-${border}`;
 
-    // circleCanvas.dom({
-    //     position : [0, 0],
-    //     size     : ['full', 'full'],
-    //     bg       : 'rgba(255,0,0,0.1)',
-    //     zoom     : -1
-    // });
+    if (!circlePool[key]) {
+        // 离屏渲染
+        let circleCanvas = new Canvas({
+            name : 'circle',
+            wh   : [radius, radius]
+        });
 
-    let circle = circleCanvas.dom({
-        bg       : color,
-        name     : 'base-circle',
-        position : [0, 0],
-        size     : [radius, radius],
-        radius   : radius,
-        border,
-        zoom     : 1
-    });
+        // circleCanvas.dom({
+        //     position : [0, 0],
+        //     size     : ['full', 'full'],
+        //     bg       : 'rgba(255,0,0,0.1)',
+        //     zoom     : -1
+        // });
 
-    return circle;
+        circlePool[key] = circleCanvas.dom({
+            bg       : color,
+            name     : 'base-circle',
+            position : [0, 0],
+            size     : [radius, radius],
+            radius   : radius,
+            border,
+            zoom     : 1
+        });
+    }
+
+    return circlePool[key].ctx;
 };

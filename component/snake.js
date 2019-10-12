@@ -1,8 +1,8 @@
 // snake 类
 
-const GradientColor = require('../utils/gradientColor');
-const { getGuid, computerOffset } = require('../utils/index');
-const Circle = require('./circle');
+// const GradientColor = require('../utils/gradientColor');
+const { getGuid } = require('../utils/index'); // computerOffset
+const getCircleImg = require('./circle');
 
 const COLORS = ['#00fffa', '#009aff', '#005fff', '#1700ff', '#8c00ff', '#eb00ff', '#ff00aa', '#ff0092', '#00ffee', '#ff007a'];
 const DELAY  = 5; // 延时出发标志位、相当于每隔 60 * 5 帧时可以对新生成蛇身进行 autoMove
@@ -18,8 +18,8 @@ module.exports = class Snake {
 
         Object.assign(this, {
             isRobot,
-            snakeLen   : 5,
-            speed      : 2,
+            snakeLen   : 100,
+            speed      : 2.5,
             snakeId    : getGuid(),
             snakeBodys : [],
             trajectory : [],
@@ -78,8 +78,8 @@ module.exports = class Snake {
             //     v.size = JSON.parse(JSON.stringify(imgCtx.canvasInnerWH));
             // }
 
-            v.img = this.circlePage.ctx.canvas;
-            v.size = JSON.parse(JSON.stringify(this.circlePage.ctx.canvasInnerWH));
+            v.img = this.circleCtx.canvas;
+            v.size = JSON.parse(JSON.stringify(this.circleCtx.canvasInnerWH));
             v.zoom = (prevSnake ? prevSnake.snakeBodys[0].zoom : 0) + this.snakeBodys.length - i;
 
             if (v.moveTime == DELAY) {
@@ -117,27 +117,27 @@ module.exports = class Snake {
                 //     }
                 // }
 
-                // 与食物碰撞
-                for (let j = 0; j < this.scene.foodSubCanvasDom.subCanvas.doms.length; j++) {
-                    const food = this.scene.foodSubCanvasDom.subCanvas.doms[j];
+                // // 与食物碰撞
+                // for (let j = 0; j < this.scene.foodSubCanvasDom.subCanvas.doms.length; j++) {
+                //     const food = this.scene.foodSubCanvasDom.subCanvas.doms[j];
 
-                    if (!/food-/.test(food.name)) continue;
+                //     if (!/food-/.test(food.name)) continue;
 
-                    let { z } = computerOffset([
-                        food.position[0] + food.size[0] / 2,
-                        food.position[1] + food.size[1] / 2
-                    ], [
-                        v.position[0] + food.size[0] / 2,
-                        v.position[1] + food.size[1] / 2
-                    ]);
-                    // let { z } = computerOffset(food.position, v.position);
+                //     let { z } = computerOffset([
+                //         food.position[0] + food.size[0] / 2,
+                //         food.position[1] + food.size[1] / 2
+                //     ], [
+                //         v.position[0] + food.size[0] / 2,
+                //         v.position[1] + food.size[1] / 2
+                //     ]);
+                //     // let { z } = computerOffset(food.position, v.position);
 
-                    if (z < (this.radius + food.size[0] / 2) / 2) {
-                        this.scene.foodSubCanvasDom.subCanvas.reRender(food);
-                        this.snakeLen++;
-                        break;
-                    }
-                }
+                //     if (z < (this.radius + food.size[0] / 2) / 2) {
+                //         this.scene.foodSubCanvasDom.subCanvas.reRender(food);
+                //         this.snakeLen++;
+                //         break;
+                //     }
+                // }
             }
         }
     }
@@ -150,15 +150,14 @@ module.exports = class Snake {
      */
     renderSnake() {
 
-        let self = this;
         let subtract = this.snakeLen - this.snakeBodys.length;
         if (subtract <= 0) return;
 
         for (let i = 0; i < subtract; i++) {
-            let _l = this.snakeBodys.length + 1;
+            // let _l = this.snakeBodys.length + 1;
             // 根据蛇长算出蛇宽度
-            // this.radius = 27.5;
-            this.radius = _l / 4 + 25;
+            // this.radius = _l / 4 + 25;
+            this.radius = 25;
 
             // 计算界限
             this.limitArea = this.scene.limitArea(this.radius);
@@ -166,27 +165,26 @@ module.exports = class Snake {
             // // 蛇身渐变色
             // this.snakeColor = new GradientColor(...this.colors, _l);
 
-            let circlePage = window.canvasPage.find(v => v.canvasName == 'circle' && v.doms[0].radius == self.radius && v.doms[0].color == self.colors);
-            this.circlePage = circlePage || new Circle({ radius: this.radius, color: this.colors[0], border: 1 });
+            this.circleCtx = getCircleImg({ radius: this.radius, color: this.colors[0], border: 1 });
 
             let position = [0, 0];
 
-            let prev = self.snakeBodys[self.snakeBodys.length - 1];
+            let prev = this.snakeBodys[this.snakeBodys.length - 1];
 
             if (prev) {
                 position = JSON.parse(JSON.stringify(prev.position));
             } else {
                 let xy = this.scene.randomCoordinates(this.radius);
-                position = self.isRobot ? xy : ['center', 'center'];
+                position = this.isRobot ? xy : ['center', 'center'];
             }
 
-            let snakeB = self.scene.screenCanvas.dom({
-                name      : `snake-${self.snakeBodys.length.toString().padStart(5, 0)}-${self.snakeId}`,
-                subCanvas : this.circlePage,
+            let snakeB = this.scene.screenCanvas.dom({
+                name   : `snake-${this.snakeBodys.length.toString().padStart(5, 0)}-${this.snakeId}`,
+                subCtx : this.circleCtx,
                 position
             });
 
-            self.snakeBodys.push(snakeB);
+            this.snakeBodys.push(snakeB);
         }
     }
 
@@ -222,6 +220,7 @@ module.exports = class Snake {
         // }
 
         // 蛇各种属性计算
+        // snakeHead.position = JSON.parse(JSON.stringify(this.dshp));
         this.computeSnake();
     }
 };
