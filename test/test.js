@@ -11,7 +11,7 @@ module.exports = class Scene {
         this.speed = 10; // 粒子速度
         this.timer = null; // 定时器
 
-        this.useOffCanvas = false; // 是否使用离屏渲染
+        this.useOffCanvas = true; // 是否使用离屏渲染
 
         this.count = 0; // 计算动画执行的次数
         this.time = new Date().getTime(); // 起始时间
@@ -157,10 +157,13 @@ class Particle {
         this.ctx.closePath();
         this.ctx.fill();
         this.ctx.restore();
+
+        this.img = new Image();
+        this.img.src = this.canvas.toDataURL();
     }
 
     // 移动粒子
     move(_ctx, x, y) {
-        _ctx.drawImage(this.canvas, x, y);
+        _ctx.drawImage(this.img, x, y);
     }
 }
