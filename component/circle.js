@@ -45,7 +45,7 @@ module.exports = function(params) {
         });
 
         // 直接用离屏的canvas部分机型依旧存在掉帧现象，需要将canvas转为img再画上画布
-        window.resourceCtrl.add(key, circleCanvas.ctx.canvas.toDataURL());
+        circleCanvas.promise = window.resourceCtrl.add(key, circleCanvas.ctx.canvas.toDataURL());
         circleCanvas.img = window.resourceCtrl.re[key];
         circlePool[key] = circleCanvas;
     }

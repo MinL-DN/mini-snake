@@ -1,7 +1,7 @@
 // snake 类
 
 // const GradientColor = require('../utils/gradientColor');
-const { getGuid } = require('../utils/index'); // computerOffset
+const { getGuid, computerOffset } = require('../utils/index');
 const getCircleImg = require('./circle');
 
 const COLORS = ['#00fffa', '#009aff', '#005fff', '#1700ff', '#8c00ff', '#eb00ff', '#ff00aa', '#ff0092', '#00ffee', '#ff007a'];
@@ -18,7 +18,7 @@ module.exports = class Snake {
 
         Object.assign(this, {
             isRobot,
-            snakeLen   : 10,
+            snakeLen   : 20,
             speed      : 2.5,
             snakeId    : getGuid(),
             snakeBodys : [],
@@ -116,27 +116,27 @@ module.exports = class Snake {
                 //     }
                 // }
 
-                // // 与食物碰撞
-                // for (let j = 0; j < this.scene.foodSubCanvasDom.subCanvas.doms.length; j++) {
-                //     const food = this.scene.foodSubCanvasDom.subCanvas.doms[j];
+                // 与食物碰撞
+                for (let j = 0; j < this.scene.foodCanvas.doms.length; j++) {
+                    const food = this.scene.foodCanvas.doms[j];
 
-                //     if (!/food-/.test(food.name)) continue;
+                    if (!/food-/.test(food.name)) continue;
 
-                //     let { z } = computerOffset([
-                //         food.position[0] + food.size[0] / 2,
-                //         food.position[1] + food.size[1] / 2
-                //     ], [
-                //         v.position[0] + food.size[0] / 2,
-                //         v.position[1] + food.size[1] / 2
-                //     ]);
-                //     // let { z } = computerOffset(food.position, v.position);
+                    // let { z } = computerOffset([
+                    //     food.position[0] + food.size[0] / 2,
+                    //     food.position[1] + food.size[1] / 2
+                    // ], [
+                    //     v.position[0] + food.size[0] / 2,
+                    //     v.position[1] + food.size[1] / 2
+                    // ]);
+                    let { z } = computerOffset(food.position, v.position);
 
-                //     if (z < (this.radius + food.size[0] / 2) / 2) {
-                //         this.scene.foodSubCanvasDom.subCanvas.reRender(food);
-                //         this.snakeLen++;
-                //         break;
-                //     }
-                // }
+                    if (z < (this.radius + food.size[0]) / 2) {
+                        this.scene.foodCanvas.reRender(food);
+                        this.snakeLen++;
+                        break;
+                    }
+                }
             }
         }
     }

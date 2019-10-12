@@ -45,7 +45,7 @@ module.exports = class Dom {
 
         // 超出屏幕不渲染
         if (
-            !this.zoom ||
+            this.zoom === undefined ||
             !window.test &&
             ctx.canvasOffset && this.size[0] < ctx.canvasInnerWH[0] && this.size[1] < ctx.canvasInnerWH[1] &&
             (

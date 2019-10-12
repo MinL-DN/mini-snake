@@ -11,16 +11,22 @@ module.exports = class FoodCanvas extends Canvas {
 
     constructor(params) {
 
-        super({
-            name : 'food',
-            wh   : params.scene.bgDom.size
-        });
+        super({ name: 'food', wh: params.scene.bgDom.size });
+
+        let self = this;
 
         this.scene = params.scene;
 
-        for (let i = 0; i < 0; i++) {
-            this.createFood();
+        this.renderFlag = [];
+
+        for (let i = 0; i < 50; i++) {
+            this.renderFlag.push(this.createFood());
         }
+
+        Promise.all(this.renderFlag).then(re => {
+            self.ctx.clearRect(0, 0, self.ctx.canvas.width, self.ctx.canvas.height);
+            self.doms.forEach(v => v.render());
+        });
     }
 
     createFood() {
@@ -29,7 +35,7 @@ module.exports = class FoodCanvas extends Canvas {
 
         let xy = this.scene.randomCoordinates(radius);
 
-        let circleCtx = getCircleImg({ radius, color });
+        let circle = getCircleImg({ radius, color });
 
         // this.dom({
         //     position : [0, 0],
@@ -42,9 +48,12 @@ module.exports = class FoodCanvas extends Canvas {
         this.dom({
             name     : `food-${getGuid()}`,
             position : xy,
-            subCtx   : circleCtx,
+            size     : circle.ctx.canvasInnerWH,
+            img      : circle.img,
             zoom     : this.doms.length + 1
         });
+
+        return circle.promise;
     }
 
     // 重渲染

@@ -42,11 +42,12 @@ module.exports = class Main extends Base {
         }
 
         // 食物层
-        this.foodSubCanvasDom = this.screenCanvas.dom({
+        this.foodCanvas = new FoodCanvas({ scene: this });
+        this.screenCanvas.dom({
             name     : 'foodSubCanvas',
             size     : this.bgDom.size,
             position : [0, 0],
-            subCtx   : new FoodCanvas({ scene: this }),
+            subCtx   : this.foodCanvas.ctx,
             zoom     : 0
         });
 
