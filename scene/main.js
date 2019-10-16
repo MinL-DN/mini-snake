@@ -1,5 +1,5 @@
 
-const Base = require('./index');
+const Base = require('./base');
 const Snake = require('../component/snake');
 const Camera = require('../component/camera');
 const FoodCanvas = require('../component/food-canvas');

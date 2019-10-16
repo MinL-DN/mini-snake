@@ -18,7 +18,7 @@ module.exports = class Snake {
 
         Object.assign(this, {
             isRobot,
-            snakeLen   : 20,
+            snakeLen   : 5,
             speed      : 2.5,
             snakeId    : getGuid(),
             snakeBodys : [],
