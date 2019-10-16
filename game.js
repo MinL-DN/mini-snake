@@ -1,8 +1,6 @@
 // gamejson setting
 // "deviceOrientation": "landscape"
 
-require('./utils/libs/weapp-adapter');
-require('./utils/libs/symbol');
 const ResourceCtrl = require('./utils/resource-ctrl');
 const Canvas = require('./utils/canvas');
 const Main   = require('./scene/main');
@@ -15,7 +13,7 @@ let resourceCtrl = new ResourceCtrl();
 resourceCtrl.load().then(() => {
     window.resourceCtrl = resourceCtrl;
 
-    new Canvas({ name: 'screen', _canvas: canvas });
+    new Canvas({ name: 'screen' });
 
     // 开启主页
     new Main();

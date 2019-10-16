@@ -1,6 +1,6 @@
 
 module.exports = {
-    regeneratorRuntime: require('./libs/runtime'),
+    regeneratorRuntime: require('./runtime'),
 
     // guid
     getGuid: function() {

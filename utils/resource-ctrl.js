@@ -1,5 +1,5 @@
 
-const { regeneratorRuntime } = require('./index.js');
+// const { regeneratorRuntime } = require('./index.js');
 
 // 加载资源
 module.exports = class LoadRe {
@@ -19,7 +19,7 @@ module.exports = class LoadRe {
 
         let self = this;
 
-        this.re[name] = new Image();
+        this.re[name] = wx.createImage();
         this.re[name].src = src;
 
         return new Promise(res => {
